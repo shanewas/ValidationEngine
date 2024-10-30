@@ -1,0 +1,480 @@
+<div class="form-wrapper" style="max-width: 1200px; margin: 0 auto;">
+    <div class="form-container" style="padding: 20px;">
+        <h3 style="color: #333;">バリデーションルールフォーム</h3>
+        <p style="color: #555; margin-bottom: 20px;">
+            このフォームは、バリデーションルールを設定するためのものです。必要な情報を入力してください。
+        </p>
+        <form id="validation-form">
+            <!-- ルール情報 -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="rule-name" style="display: block; margin-bottom: 10px;">ルール名:</label>
+                <input type="text" id="rule-name" name="rule-name" placeholder="ルール名を入力" required="" style="width: 100%; padding: 10px;">
+                <small style="color: #777;">ルールの識別に使われる名前を入力してください。</small>
+            </div>
+
+            <fieldset style="margin-bottom: 30px;">
+                <button class="plus-sign-btn" type="button" id="add-condition" style="display: inline-flex; align-items: center; cursor: pointer; margin-bottom: 10px; background: none; border: none; color: #588fc6;">
+                    <span class="plus-sign" style="margin-right: 5px;">+</span> 条件を追加
+                </button>
+
+                <!-- Collapsible Section for 条件 -->
+                <div class="collapsible-trigger" style="cursor: pointer; display: flex; align-items: center; margin-bottom: 10px; border-radius: 5px;" onclick="const content = document.getElementById('collapsibleContent'); const arrow = document.getElementById('arrow'); if (content.style.display === 'block') { content.style.display = 'none'; arrow.textContent = '▼'; arrow.style.transform = 'rotate(0deg)'; } else { content.style.display = 'block'; arrow.textContent = '▲'; arrow.style.transform = 'rotate(90deg)'; }">
+                    <span class="arrow-sign" style="margin-right: 10px; color: rgb(88, 143, 198); font-size: 0.8em; transition: transform 0.5s;" id="arrow">▲</span>
+                    <strong>条件 1</strong>
+                </div>
+                <div class="collapsible-content" id="collapsibleContent" style="display: block; padding: 10px; border: 1px solid rgb(204, 204, 204); border-radius: 5px; margin-top: 5px;">
+                    <p style="color: #555;">この条件は、バリデーションのルールに適用される条件を設定します。</p>
+                    <div class="form-group-row" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="pdf-id" style="display: block; margin-bottom: 10px;">PDF ID:</label>
+                            <select id="pdf-id" name="pdf-id" style="width: 100%; padding: 10px;">
+                                <option value="Field1">フィールド1</option>
+                                <option value="Field2">フィールド2</option>
+                                <option value="Field3">フィールド3</option>
+                            </select>
+                            <small style="color: #777;">適用するPDFフィールドを選択してください。</small>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="page" style="display: block; margin-bottom: 10px;">ページ:</label>
+                            <select id="page" name="page" style="width: 100%; padding: 10px;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                            <small style="color: #777;">条件が適用されるページを選択してください。</small>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="field-id" style="display: block; margin-bottom: 10px;">フィールド ID:</label>
+                            <select id="field-id" name="field-id" style="width: 100%; padding: 10px;">
+                                <option value="Field1">フィールド1</option>
+                                <option value="Field2">フィールド2</option>
+                                <option value="Field3">フィールド3</option>
+                            </select>
+                            <small style="color: #777;">関連するフィールドを選択してください。</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="type" style="display: block; margin-bottom: 10px;">タイプ:</label>
+                            <select id="type" name="type" style="width: 100%; padding: 10px;">
+                                <option value="REQUIRED">必須</option>
+                                <option value="COMPARISON">比較</option>
+                                <option value="DEPENDENCY">依存関係</option>
+                                <option value="TYPE_CHECK">型チェック</option>
+                                <option value="LENGTH_CHECK">長さチェック</option>
+                                <option value="EMPTY_CHECK">空チェック</option>
+                                <option value="REGEX">正規表現</option>
+                                <option value="CUSTOM">カスタム</option>
+                            </select>
+                            <small style="color: #777;">適用するバリデーションのタイプを選択してください。</small>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="operator-cond" style="display: block; margin-bottom: 10px;">オペレーター:</label>
+                            <select id="operator-cond" name="operator-cond" style="width: 100%; padding: 10px;">
+                                <option value="EQUALS">等しい</option>
+                                <option value="NOT_EQUALS">等しくない</option>
+                                <option value="GREATER_THAN">より大きい</option>
+                                <option value="LESS_THAN">より小さい</option>
+                                <option value="CONTAINS">含む</option>
+                                <option value="STARTS_WITH">始まる</option>
+                            </select>
+                            <small style="color: #777;">条件に使用する演算子を選択してください。</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="value" style="display: block; margin-bottom: 10px;">値:</label>
+                        <textarea id="value" name="value" placeholder="値を入力" style="width: 100%; padding: 10px; height: 150px; font-family: monospace; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+                        <small style="color: #777;">条件の値を入力してください。</small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="condition-error-message" style="display: block; margin-bottom: 10px;">エラーメッセージ:</label>
+                        <input type="text" id="condition-error-message" name="condition-error-message" placeholder="条件のエラーメッセージを入力" style="width: 100%; padding: 10px;">
+                        <small style="color: #777;">条件が満たされない場合のエラーメッセージを入力してください。</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="description" style="display: block; margin-bottom: 10px;">説明:</label>
+                        <textarea id="description" name="description" placeholder="条件の説明を入力" style="width: 100%; padding: 10px;"></textarea>
+                        <small style="color: #777;">条件の詳細な説明を入力してください。</small>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Submit Button -->
+            <button type="submit" style="padding: 10px 15px; background-color: #588fc6; color: #fff; border: none; cursor: pointer; border-radius: 5px;">
+                ルールを保存
+            </button>
+        </form>
+    </div>
+</div>
+
+// Toggles collapsible content display
+function toggleContent() {
+    const content = document.getElementById('collapsibleContent');
+    const arrow = document.getElementById('arrow');
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+        arrow.textContent = '▼';
+        arrow.style.transform = 'rotate(0deg)';
+    } else {
+        content.style.display = 'block';
+        arrow.textContent = '▲';
+        arrow.style.transform = 'rotate(90deg)';
+    }
+}
+
+// Handles the display logic for fields based on type selection
+function handleTypeChange() {
+    const type = document.getElementById('type').value;
+    const operatorField = document.getElementById('operatorField');
+    const valueField = document.getElementById('valueField');
+    const expectedTypeField = document.getElementById('expectedTypeField');
+    const dependentFields = document.getElementById('dependentFields');
+
+    // Show or hide operator, value, expected type, and dependent fields based on selected type
+    operatorField.style.display = 'none';
+    valueField.style.display = 'none';
+    expectedTypeField.style.display = 'none';
+    dependentFields.style.display = 'none'; // Hide dependent fields by default
+
+    switch (type) {
+        case 'COMPARISON':
+            operatorField.style.display = 'block';
+            valueField.style.display = 'block';
+            break;
+        case 'CUSTOM':
+            valueField.style.display = 'block';
+            break;
+        case 'REQUIRED':
+        case 'EMPTY_CHECK':
+            // All fields remain hidden (default behavior)
+            break;
+        case 'TYPE_CHECK':
+            expectedTypeField.style.display = 'block';
+            break;
+        case 'DEPENDENCY':
+            dependentFields.style.display = 'block';
+            break;
+        default:
+            valueField.style.display = 'block';
+            break;
+    }
+}
+
+// Adjusts the display based on the operator selection
+function handleOperatorChange() {
+    const operator = document.getElementById('operator-cond').value;
+    const valueField = document.getElementById('valueField');
+
+    // Clear previous innerHTML for valueField
+    valueField.innerHTML = '';
+
+    // Update valueField based on selected operator
+    switch (operator) {
+        case 'BETWEEN':
+            valueField.innerHTML = `
+                <label for="value-start" style="display: block; margin-bottom: 10px;">範囲開始:</label>
+                <input type="text" id="value-start" name="value-start" placeholder="開始値" style="width: 100%; padding: 10px;">
+                <label for="value-end" style="display: block; margin-bottom: 10px;">範囲終了:</label>
+                <input type="text" id="value-end" name="value-end" placeholder="終了値" style="width: 100%; padding: 10px;">
+            `;
+            break;
+        case 'BEFORE':
+        case 'AFTER':
+            valueField.innerHTML = `
+                <label for="value-date" style="display: block; margin-bottom: 10px;">日付:</label>
+                <input type="date" id="value-date" name="value-date" style="width: 100%; padding: 10px;">
+            `;
+            break;
+        default:
+            valueField.innerHTML = `
+                <label for="value" style="display: block; margin-bottom: 10px;">値:</label>
+                <textarea id="value" name="value" placeholder="値を入力" style="width: 100%; padding: 10px; height: 150px; font-family: monospace; border: 1px solid #ccc; border-radius: 4px; resize: vertical;"></textarea>
+            `;
+            break;
+    }
+}
+
+// Handles the display logic for dependent type change
+function handleDependentTypeChange() {
+    const dependentType = document.getElementById('dependent-type').value;
+    const dependentValueField = document.getElementById('dependent-value-field');
+
+    // Show or hide dependent value field based on selected dependent type
+    dependentValueField.style.display = (dependentType === 'CUSTOM') ? 'block' : 'none';
+}
+
+// Initialize event listeners and set the initial state on page load
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('type').addEventListener('change', handleTypeChange);
+    document.getElementById('operator-cond').addEventListener('change', handleOperatorChange);
+    document.getElementById('dependent-type').addEventListener('change', handleDependentTypeChange);
+    
+    handleTypeChange();  // Set initial state based on default selection
+});
+
+
+<div class="form-wrapper" style="max-width: 1200px; margin: 0 auto;">
+    <div class="form-container" style="padding: 20px;">
+        <h3 style="color: #333;">バリデーションルールフォーム</h3>
+        <p style="color: #555; margin-bottom: 20px;">
+            このフォームは、バリデーションルールを設定するためのものです。必要な情報を入力してください。
+        </p>
+        <form id="validation-form">
+            <!-- ルール情報 -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="rule-name" style="display: block; margin-bottom: 10px;">ルール名:</label>
+                <input type="text" id="rule-name" name="rule-name" placeholder="ルール名を入力" required="" style="width: 100%; padding: 10px;" spellcheck="false" data-ms-editor="true" _mstplaceholder="15308631">
+                <small style="color: #777;">ルールの識別に使われる名前を入力してください。</small>
+            </div>
+
+            <fieldset style="margin-bottom: 30px;">
+                <button class="plus-sign-btn" type="button" id="add-condition" style="display: inline-flex; align-items: center; cursor: pointer; margin-bottom: 10px; background: none; border: none; color: #588fc6;">
+                    <span class="plus-sign" style="margin-right: 5px;">+</span><font _mstmutation="1"> 条件を追加
+                </font></button>
+
+                <!-- Collapsible Section for 条件 -->
+                <div class="collapsible-trigger" style="cursor: pointer; display: flex; align-items: center; margin-bottom: 10px; border-radius: 5px;" onclick="toggleContent()">
+                    <span class="arrow-sign" style="margin-right: 10px; color: rgb(88, 143, 198); font-size: 0.8em; transition: transform 0.5s;" id="arrow">▲</span>
+                    <strong>条件 1</strong>
+                </div>
+                <div class="collapsible-content" id="collapsibleContent" style="display: block; padding: 10px; border: 1px solid rgb(204, 204, 204); border-radius: 5px; margin-top: 5px;">
+                    <p style="color: #555;">この条件は、バリデーションのルールに適用される条件を設定します。</p>
+                    <div class="form-group-row" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="pdf-id" style="display: block; margin-bottom: 10px;">PDF ID:</label>
+                            <select id="pdf-id" name="pdf-id" style="width: 100%; padding: 10px;">
+                                <option value="Field1">フィールド1</option>
+                                <option value="Field2">フィールド2</option>
+                                <option value="Field3">フィールド3</option>
+                            </select>
+                            <small style="color: #777;">適用するPDFフィールドを選択してください。</small>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="page" style="display: block; margin-bottom: 10px;">ページ:</label>
+                            <select id="page" name="page" style="width: 100%; padding: 10px;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                            <small style="color: #777;">条件が適用されるページを選択してください。</small>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="field-id" style="display: block; margin-bottom: 10px;">フィールド ID:</label>
+                            <select id="field-id" name="field-id" style="width: 100%; padding: 10px;">
+                                <option value="Field1">フィールド1</option>
+                                <option value="Field2">フィールド2</option>
+                                <option value="Field3">フィールド3</option>
+                            </select>
+                            <small style="color: #777;">関連するフィールドを選択してください。</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="type" style="display: block; margin-bottom: 10px;">タイプ:</label>
+                            <select id="type" name="type" style="width: 100%; padding: 10px;" onchange="handleTypeChange()">
+                                <option value="REQUIRED">必須</option>
+                                <option value="COMPARISON">比較</option>
+                                <option value="DEPENDENCY">依存関係</option>
+                                <option value="SUGGESTION">サジェスト</option>
+                                <option value="TYPE_CHECK">型チェック</option>
+                                <option value="LENGTH_CHECK">長さチェック</option>
+                                <option value="EMPTY_CHECK">空チェック</option>
+                                <option value="REGEX">正規表現</option>
+                                <option value="CUSTOM">カスタム</option>
+                            </select>
+                            <small style="color: #777;">適用するバリデーションのタイプを選択してください。</small>
+                        </div>
+                        <div class="form-group" style="flex: 1 1 0%; display: none;" id="operatorField">
+                            <label for="operator-cond" style="display: block; margin-bottom: 10px;">オペレーター:</label>
+                            <select id="operator-cond" name="operator-cond" style="width: 100%; padding: 10px;" onchange="handleOperatorChange()">
+                                <option value="EQUALS">等しい</option>
+                                <option value="NOT_EQUALS">等しくない</option>
+                                <option value="GREATER_THAN">より大きい</option>
+                                <option value="LESS_THAN">より小さい</option>
+                                <option value="CONTAINS">含む</option>
+                                <option value="STARTS_WITH">始まる</option>
+                                <option value="ENDS_WITH">終わる</option>
+                                <option value="BETWEEN">範囲</option>
+                                <option value="BEFORE">以前</option>
+                                <option value="AFTER">以降</option>
+                            </select>
+                            <small style="color: #777;">条件に使用する演算子を選択してください。</small>
+                        </div>
+                    </div>
+
+<div id="dependentFields" style="display: none;">
+    <div class="form-group-row" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+        <div class="form-group" style="flex: 1;">
+            <label for="dependent-field-id" style="display: block; margin-bottom: 10px;">Dependent Field ID:</label>
+            <select id="dependent-field-id" name="dependent-field-id" style="width: 100%; padding: 10px;">
+                <option value="Field1">フィールド1</option>
+                <option value="Field2">フィールド2</option>
+                <option value="Field3">フィールド3</option>
+            </select>
+            <small style="color: #777;">依存関係のフィールドIDを選択してください。</small>
+        </div>
+<div class="form-group" style="flex: 1;">
+            <label for="dependent-type" style="display: block; margin-bottom: 10px;">Dependent Type:</label>
+            <select id="dependent-type" name="dependent-type" style="width: 100%; padding: 10px;">
+                <option value="REQUIRED">必須</option>
+                <option value="COMPARISON">比較</option>
+                <option value="TYPE_CHECK">型チェック</option>
+                <option value="LENGTH_CHECK">長さチェック</option>
+                <option value="EMPTY_CHECK">空チェック</option>
+                <option value="CUSTOM">カスタム</option>
+            </select>
+            <small style="color: #777;">依存関係のタイプを選択してください。</small>
+        </div>
+    </div>
+
+    <div class="form-group-row" style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+        <div class="form-group" style="flex: 1;">
+            <label for="dependent-operator" style="display: block; margin-bottom: 10px;">Dependent Operator:</label>
+            <select id="dependent-operator" name="dependent-operator" style="width: 100%; padding: 10px;">
+                <option value="EQUALS">等しい</option>
+                <option value="NOT_EQUALS">等しくない</option>
+                <option value="GREATER_THAN">より大きい</option>
+                <option value="LESS_THAN">より小さい</option>
+                <option value="CONTAINS">含む</option>
+                <option value="STARTS_WITH">始まる</option>
+                <option value="ENDS_WITH">終わる</option>
+                 <option value="EMPTY">空</option> <!-- Added empty option -->
+                <option value="NOT_EMPTY">空でない</option> <!-- Added not empty option -->
+            </select>
+            <small style="color: #777;">依存フィールドの演算子を選択してください。</small>
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label for="dependent-value" style="display: block; margin-bottom: 10px;">Dependent Value:</label>
+            <input type="text" id="dependent-value" name="dependent-value" placeholder="Dependent value" style="width: 100%; padding: 10px;">
+            <small style="color: #777;">依存フィールドが持つべき値を入力してください。</small>
+        </div>
+    </div>
+</div>
+
+
+<div id="valueField" style="display: none;">
+            <label for="value-date" style="display: block; margin-bottom: 10px;">日付:</label>
+            <input type="date" id="value-date" name="value-date" style="width: 100%; padding: 10px;">
+        </div>
+
+<div id="expectedTypeField" style="display: none;">
+    <label for="expected-type" style="display: block; margin-bottom: 10px;">期待される型:</label>
+    <select id="expected-type" name="expected-type" style="width: 100%; padding: 10px;">
+        <option value="string">文字列</option>
+        <option value="number">数値</option>
+        <option value="boolean">ブール値</option>
+        <!-- Add more types as needed -->
+    </select>
+    <small style="color: #777;">期待するデータの型を選択してください。</small>
+</div>
+<div id="dependentFields" style="display: none;">
+    <!-- Add dependent fields here -->
+</div>
+
+                    
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="condition-error-message" style="display: block; margin-bottom: 10px;">エラーメッセージ:</label>
+                        <input type="text" id="condition-error-message" name="condition-error-message" placeholder="条件のエラーメッセージを入力" style="width: 100%; padding: 10px;" spellcheck="false" data-ms-editor="true" _mstplaceholder="37065535">
+                        <small style="color: #777;">条件が満たされない場合のエラーメッセージを入力してください。</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="description" style="display: block; margin-bottom: 10px;">説明:</label>
+                        <textarea id="description" name="description" placeholder="条件の説明を入力" style="width: 100%; padding: 10px;" spellcheck="false" data-ms-editor="true" _mstplaceholder="23622066"></textarea>
+                        <small style="color: #777;">条件の詳細な説明を入力してください。</small>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Submit Button -->
+            <button type="submit" style="padding: 10px 15px; background-color: #588fc6; color: #fff; border: none; cursor: pointer; border-radius: 5px;">
+                ルールを保存
+            </button>
+        </form>
+    </div>
+</div>
+
+
+
+
++------------------------------------------------------+													
+| ? ? ? ? ? ? ? ? ?Validation Rule Form ? ? ? ? ? ? ? ?|													
++------------------------------------------------------+													
+| Validation Template ID: [__________________________] | ?# A unique identifier for the validation template.													
+| Version: [____] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# The version number of the validation template.													
++------------------------------------------------------+													
+| Rule ID: [__________________________] ? ? ? ? ? ? ? ?| ?# A unique identifier for the rule.													
+| Rule Name: [__________________________] ? ? ? ? ? ? ?| ?# The name of the rule.													
++------------------------------------------------------+													
+| Group 1: ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? Priority: [Dropdown: High/Medium/Low] ? ? ? ? ? ? ?| ?# The priority of this group.													
+| ? Operator: [Dropdown: AND/OR] ? ? ? ? ? ? ? ? ? ? ? | ?# Choose whether conditions in this group are combined with AND or OR.													
+|   Scope: [Dropdown: Form/Field/Section] ? ? ? ? ? ? ?| ?# The scope of the validation rule.													
+| ? Error Message: [__________________________] ? ? ? ?| ?# Error message displayed if any condition in the group fails.													
+| ? Condition 1: ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? Pdf ID: [Dropdown: Select Field] ? ? ? ? ?   ? ? | ?# The ID of the pdf this condition applies to.													
+| ? ? Page: [Dropdown: Select Field] ? ? ? ? ?     ? ? | ?# The page no of the pdf this condition applies to.													
+| ? ? Field ID: [Dropdown: Select Field] ? ? ? ? ? ? ? | ?# The ID of the field this condition applies to.													
+| ? ? ? - Field1 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - Field2 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - Field3 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? Type: [Dropdown: Select Type] ? ? ? ? ? ? ? ? ? ?| ?# The type of condition.													
+| ? ? ? - REQUIRED ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - COMPARISON ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - DEPENDENCY ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - TYPE_CHECK ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - LENGTH_CHECK ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - EMPTY_CHECK ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - REGEX ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# New option for regular expression validation.													
+| ? ? ? - CUSTOM ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? | ?# New option for custom validation functions.													
+| ? ? Operator: [Dropdown: Select Operator] ? ? ? ? ? ?| ?# The comparison operator used for validation (for COMPARISON type).													
+| ? ? ? - EQUALS ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - NOT_EQUALS ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - GREATER_THAN ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - LESS_THAN ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - GREATER_THAN_OR_EQUAL ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - LESS_THAN_OR_EQUAL ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - CONTAINS ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - STARTS_WITH ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - ENDS_WITH ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - BETWEEN ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# New option for range checks.													
+| ? ? ? - BEFORE ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? | ?# New option for date comparisons.													
+| ? ? ? - AFTER ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# New option for date comparisons.													
+| ? ? Value: [__________________________] ? ? ? ? ? ? ?| ?# The value to compare against (for COMPARISON type).													
+| ? ? Expected Type: [Dropdown: Select Type] ? ? ? ? ? | ?# The expected data type of the field (for TYPE_CHECK type).													
+| ? ? ? - string ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - number ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - boolean ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - array ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - object ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - integer ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - null ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - date ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - datetime ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - email ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? ? - url ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?|													
+| ? ? Min Length: [____] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? | ?# The minimum length of the field value (for LENGTH_CHECK type).													
+| ? ? Max Length: [____] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? | ?# The maximum length of the field value (for LENGTH_CHECK type).													
+| ? ? Dependent Field ID: [Dropdown: Select Field] ? ? | ?# The ID of the dependent field (for DEPENDENCY type).													
+| ? ? ? - Field1 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - Field2 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? ? - Field3 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? |													
+| ? ? Dependent Value: [__________________________] ? ?| ?# The value that the dependent field must have (for DEPENDENCY type).													
+| ? ? Error Message: [__________________________] ? ? ?| ?# Error message displayed if the condition fails.													
+| ? ? Description: [__________________________] ? ? ? ?| ?# Brief description of the condition.													
+| ? ? Order: [____] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# The order in which this condition is evaluated.													
+| ? ? Priority: [Dropdown: High/Medium/Low] ? ? ? ? ? ?| ?# The priority of this condition.													
++------------------------------------------------------+													
+| [Add Another Condition] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# Button to add another condition to the rule.													
++------------------------------------------------------+													
+| [Add Another Group] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?| ?# Button to add another group of conditions.													
++------------------------------------------------------+													
+| Documentation: [__________________________] ? ? ? ? ?| ?# Section for notes or documentation.													
++------------------------------------------------------+													
+| [Submit] ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? | ?# Button to submit the form and save the validation rule.													
++------------------------------------------------------+													
+													

@@ -1,0 +1,117 @@
+{
+    "validationSystem": {
+        "metadata": {
+            "version": "1.0",
+            "lastUpdated": "2024-10-30",
+            "description": "Validation rules for PDF form"
+        },
+        "validationTemplates": [
+            {
+                "templateId": "TEMPLATE_001",
+                "version": "1.0",
+                "name": "Basic PDF Validation",
+                "description": "Validation rules for basic fields in PDF",
+                "rules": [
+                    {
+                        "ruleId": "RULE_001",
+                        "ruleName": "Required Field Validation",
+                        "scope": "Field",
+                        "conditions": [
+                            {
+                                "conditionId": "C1",
+                                "pdfId": "PDF_123",
+                                "page": 1,
+                                "fieldId": "テキストボックス",
+                                "type": "REQUIRED",
+                                "errorMessage": "This field is required.",
+                                "description": "Ensures that the テキストボックス field is not empty."
+                            }
+                        ]
+                    },
+                    {
+                        "ruleId": "RULE_002",
+                        "ruleName": "Age Comparison",
+                        "scope": "Field",
+                        "conditions": [
+                            {
+                                "conditionId": "C2",
+                                "pdfId": "PDF_123",
+                                "page": 1,
+                                "fieldId": "Age",
+                                "type": "COMPARISON",
+                                "operator": "GREATER_THAN",
+                                "value": 18,
+                                "errorMessage": "Age must be greater than 18.",
+                                "description": "Validates that the Age field is greater than 18."
+                            }
+                        ]
+                    },
+                    {
+                        "ruleId": "RULE_003",
+                        "ruleName": "Country Dependency",
+                        "scope": "Form",
+                        "conditions": [
+                            {
+                                "conditionId": "C3",
+                                "pdfId": "PDF_123",
+                                "page": 1,
+                                "fieldId": "State",
+                                "type": "DEPENDENCY",
+                                "dependentFieldId": "Country",
+                                "dependentValue": "USA",
+                                "errorMessage": "State is required when Country is USA.",
+                                "description": "State field must be filled if Country is USA."
+                            }
+                        ]
+                    },
+                    {
+                        "ruleId": "RULE_004",
+                        "ruleName": "Password Length Check",
+                        "scope": "Field",
+                        "conditions": [
+                            {
+                                "conditionId": "C4",
+                                "pdfId": "PDF_123",
+                                "page": 1,
+                                "fieldId": "Password",
+                                "type": "LENGTH_CHECK",
+                                "minLength": 8,
+                                "maxLength": 20,
+                                "errorMessage": "Password must be between 8 and 20 characters.",
+                                "description": "Checks that password length is within the specified range."
+                            }
+                        ]
+                    },
+                    {
+                        "ruleId": "RULE_005",
+                        "ruleName": "Email Format",
+                        "scope": "Field",
+                        "conditions": [
+                            {
+                                "conditionId": "C5",
+                                "pdfId": "PDF_123",
+                                "page": 1,
+                                "fieldId": "Email",
+                                "type": "REGEX",
+                                "value": "^[\\w.%+-]+@[\\w.-]+\\.[A-Za-z]{2,}$",
+                                "errorMessage": "Invalid email format.",
+                                "description": "Ensures that the Email field is in a valid email format."
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "globalSettings": {
+        "allowPartialValidation": true,
+        "stopOnFirstError": false,
+        "validateOnChange": true,
+        "defaultLocale": "en-US",
+        "errorMessageFormat": {
+            "includeFieldName": true,
+            "includeConditionType": true,
+            "includeErrorCode": false
+        }
+    }
+}
