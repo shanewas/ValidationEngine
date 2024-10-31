@@ -409,7 +409,7 @@ class DynamicPdfValidator {
 
     // Merge all fields into a single array
     const allFields = fieldData.flatMap((pdf) => pdf.data);
-    // console.log(allFields);
+    console.log(allFields);
     for (const field of allFields) {
       const template = this.validationTemplates.find((template) =>
         template.rules.some((rule) => rule.fieldId === field.fieldName)

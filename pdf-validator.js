@@ -1,5 +1,5 @@
 // pdf-validator.js
-class PdfValidator {
+export class PdfValidator {
   constructor(validationTemplates) {
     this.validationTemplates = Array.isArray(validationTemplates)
       ? validationTemplates
