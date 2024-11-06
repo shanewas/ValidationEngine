@@ -1,7 +1,7 @@
 import { ValidationResult } from '../models/validation-result.js';
-import { ValidationContext } from '../services/validation-context.js';
-import { FieldValidator } from '../services/field-validator.js';
-import { RuleProcessor } from '../services/rule-processor.js';
+import { ValidationContext } from './validation-context.js';
+import { FieldValidator } from './field-validator.js';
+import { RuleProcessor } from './rule-processor.js';
 
 // services/validation-engine.js
 export class ValidationEngine {
