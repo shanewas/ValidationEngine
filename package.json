@@ -1,6 +1,6 @@
 {
   "name": "@shanewas/form-validation",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "A powerful and flexible validation engine for forms with support for complex rules, dependencies, and custom validations.",
   "main": "index.js",
   "type": "module",
