@@ -12,6 +12,12 @@ If you find a bug, please report it by opening an issue on our GitHub repository
 
 We welcome suggestions for new features or improvements. Please open an issue to discuss your ideas. Be sure to provide as much detail as possible and explain the benefits of your suggestion.
 
+### Commit Message Format:
+
+- <type>[optional scope]: <description>
+- [optional body]
+- [optional BREAKING CHANGE: description]
+
 ### Submitting Pull Requests
 
 1. **Fork the Repository**: Click the "Fork" button at the top of the repository page to create a copy of the repository in your GitHub account.
