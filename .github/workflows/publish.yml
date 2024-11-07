@@ -30,11 +30,17 @@ jobs:
 
       - name: Get current version
         id: get_current_version
-        run: echo "version=$(node -p -e \"require('./package.json').version\")" >> $GITHUB_ENV
+        run: node -p -e "require('./package.json').version" > current_version.txt
+
+      - name: Set current version
+        run: echo "version=$(cat current_version.txt)" >> $GITHUB_ENV
 
       - name: Get previous version
         id: get_previous_version
-        run: echo "version=$(git show origin/master:package.json | jq -r .version)" >> $GITHUB_ENV
+        run: git show origin/master:package.json | jq -r .version > previous_version.txt
+
+      - name: Set previous version
+        run: echo "previous_version=$(cat previous_version.txt)" >> $GITHUB_ENV
 
       - name: Set job name
         uses: actions/github-script@v6
@@ -46,7 +52,7 @@ jobs:
       - name: Check version change
         id: version_check
         run: |
-          if [ "${{ env.version }}" == "${{ steps.get_previous_version.outputs.version }}" ]; then
+          if [ "${{ env.version }}" == "${{ env.previous_version }}" ]; then
             echo "changed=false" >> $GITHUB_ENV
           else
             echo "changed=true" >> $GITHUB_ENV
