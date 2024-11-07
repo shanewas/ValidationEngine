@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
+          fetch-depth: 2  # Fetch the last two commits
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -30,17 +31,11 @@ jobs:
 
       - name: Get current version
         id: get_current_version
-        run: node -p -e "require('./package.json').version" > current_version.txt
-
-      - name: Set current version
-        run: echo "version=$(cat current_version.txt)" >> $GITHUB_ENV
+        run: echo "version=$(node -p -e \"require('./package.json').version\")" >> $GITHUB_ENV
 
       - name: Get previous version
         id: get_previous_version
-        run: git show origin/master:package.json | jq -r .version > previous_version.txt
-
-      - name: Set previous version
-        run: echo "previous_version=$(cat previous_version.txt)" >> $GITHUB_ENV
+        run: echo "previous_version=$(git show HEAD~1:package.json | jq -r .version)" >> $GITHUB_ENV
 
       - name: Set job name
         uses: actions/github-script@v6
