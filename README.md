@@ -1,8 +1,8 @@
 # @shanewas/form-validation
 
 [![npm version](https://img.shields.io/npm/v/@shanewas/form-validation.svg)](https://www.npmjs.com/package/@shanewas/form-validation)
-[![License: GPL v3](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/node/v/@shanewas/form-validation.svg)](https://nodejs.org)
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Node.js Version](https://img.shields.io/badge/node-v22.11.0-green.svg)](https://nodejs.org)
 
 A flexible validation engine for forms with support for complex rules, dependencies, and custom validations.
 
