@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'  # Use the Node.js version you need
 
@@ -35,8 +35,6 @@ jobs:
 
       - name: Push changes
         run: |
-          git config --global user.name 'Shanewas Ahmed'
-          git config --global user.email 'shanewasahmed@gmail.com'
           git push --follow-tags origin master
 
       - name: Authenticate to npm
