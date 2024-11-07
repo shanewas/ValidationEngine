@@ -2,8 +2,8 @@ name: Publish to npm
 
 on:
   push:
-    tags:
-      - 'v*.*.*'  # This will trigger the workflow only on version tags
+    branches:
+      - master
 
 jobs:
   publish:
@@ -29,11 +29,13 @@ jobs:
           git config --global user.email 'shanewasahmed@gmail.com'
 
       - name: Bump version and create changelog
+        id: bump_version
         run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Push changes
+        if: steps.bump_version.outputs.new_version != ''
         run: |
           git push --follow-tags origin master
 
@@ -41,6 +43,7 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish to npm
+        if: steps.bump_version.outputs.new_version != ''
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
