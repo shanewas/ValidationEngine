@@ -8,14 +8,14 @@ A powerful and flexible validation engine for forms with support for complex rul
 
 ## Features
 
-- ? Multiple validation types out of the box
-- ? Complex field dependencies
-- ? Type checking and length validation
-- ? Custom validation functions
-- ? Flexible rule configuration
-- ? Priority-based validation
-- ? Detailed error reporting
-- ? Works in both Node.js and browsers
+- Multiple validation types out of the box
+- Complex field dependencies
+- Type checking and length validation
+- Custom validation functions
+- Flexible rule configuration
+- Priority-based validation
+- Detailed error reporting
+- Works in both Node.js and browsers
 
 ## Installation
 
