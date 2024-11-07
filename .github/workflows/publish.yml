@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -21,9 +23,20 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Bump version and create changelog
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push changes
+        run: |
+          git config --global user.name 'Shanewas Ahmed'
+          git config --global user.email 'shanewasahmed@gmail.com'
+          git push --follow-tags origin master
+
       - name: Authenticate to npm
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        
+
       - name: Publish to npm
         run: npm publish
         env:
