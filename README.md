@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/node/v/@shanewas/form-validation.svg)](https://nodejs.org)
 
-A powerful and flexible validation engine for forms with support for complex rules, dependencies, and custom validations.
+A flexible validation engine for forms with support for complex rules, dependencies, and custom validations.
 
 ## Features
 
