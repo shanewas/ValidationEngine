@@ -28,6 +28,17 @@ jobs:
           git config --global user.name 'Shanewas Ahmed'
           git config --global user.email 'shanewasahmed@gmail.com'
 
+      - name: Get version
+        id: get_version
+        run: echo "::set-output name=version::$(node -p -e "require('./package.json').version")"
+
+      - name: Set job name
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const version = '${{ steps.get_version.outputs.version }}';
+            return `Publish to npm (version ${version})`;
+
       - name: Bump version and create changelog
         id: bump_version
         run: npm run release
