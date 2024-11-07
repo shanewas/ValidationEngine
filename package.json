@@ -1,0 +1,39 @@
+{
+  "name": "@shanewas/form-validation",
+  "version": "1.1.3",
+  "description": "A powerful and flexible validation engine for forms with support for complex rules, dependencies, and custom validations.",
+  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "form",
+    "validation",
+    "PDF",
+    "rules",
+    "dependency"
+  ],
+  "author": "Shanewas Ahmed",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shanewas/ValidationEngine"
+  },
+  "bugs": {
+    "url": "https://github.com/shanewas/ValidationEngine/issues"
+  },
+  "homepage": "https://www.npmjs.com/package/@shanewas/form-validation",
+  "dependencies": {
+    "@shanewas/form-validation": "file:"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
