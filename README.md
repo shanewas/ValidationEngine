@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@shanewas/form-validation.svg)](https://www.npmjs.com/package/@shanewas/form-validation)  
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)  
-[![Node.js Version](https://img.shields.io/badge/node-v22.11.0-green.svg)](https://nodejs.org)  
+[![Node.js Version](https://img.shields.io/badge/node-v22.11.0-green.svg)](https://nodejs.org)
 
 A powerful and flexible validation engine for forms with support for complex rules, dependencies, type validation, and custom validation logic.
 
@@ -11,6 +11,7 @@ A powerful and flexible validation engine for forms with support for complex rul
 ## Features
 
 - **Comprehensive Validation Types**: Supports required fields, comparisons, dependencies, type checking, regex, and more.
+- **Flexible Actions**: Execute form actions like CLEAR_FORMFIELD, UPDATE_VALUE, or custom actions based on validations.
 - **Complex Field Dependencies**: Define validations based on the values of other fields.
 - **Custom Validations**: Implement application-specific validation logic.
 - **Detailed Error Reporting**: Easy-to-understand validation results.
@@ -32,7 +33,7 @@ npm install @shanewas/form-validation
 ## Quick Start
 
 ```javascript
-import { ValidationController } from '@shanewas/form-validation';
+import { ValidationController } from "@shanewas/form-validation";
 
 // Initialize the validator
 const validator = new ValidationController();
@@ -71,7 +72,7 @@ const rules = [
     const result = await validator.validateForm(formData, rules);
     console.log(result);
   } catch (error) {
-    console.error('Validation failed:', error);
+    console.error("Validation failed:", error);
   }
 })();
 ```
@@ -95,27 +96,37 @@ const rules = [
 
 Rules are defined as objects and support a wide range of properties:
 
-```javascript
 {
-  ruleId: string,
-  conditions: [
-    {
-      fieldId: string,
-      type: string,
-      operator: string,
-      value: any,
-      expectedType: string,
-      minLength: number,
-      maxLength: number,
-      dependentFieldId: string,
-      dependentOperator: string,
-      dependentValue: any,
-      errorMessage: string,
-      description: string,
-    },
-  ],
+ruleId: string,
+conditions: [
+{
+fieldId: string,
+type: string,
+operator: string,
+value: any,
+expectedType: string,
+minLength: number,
+maxLength: number,
+dependentFieldId: string,
+dependentOperator: string,
+dependentValue: any,
+action: string, // e.g., "CLEAR_FORMFIELD", "UPDATE_VALUE"
+actionValue: any, // Additional data for the action
+errorMessage: string,
+description: string,
+},
+],
 }
-```
+
+---
+
+## Actions
+
+The following actions are supported for rule conditions:
+
+- **`CLEAR_FORMFIELD`**: Clears the value of the specified field.
+- **`UPDATE_VALUE`**: Updates the field's value to a specified value.
+- **Custom Actions**: Define custom actions in your implementation.
 
 ---
 
@@ -220,9 +231,24 @@ const formData = {
 };
 
 const rules = [
-  { fieldId: "username", type: "REQUIRED", errorMessage: "Username is required" },
-  { fieldId: "age", type: "COMPARISON", operator: "GREATER_THAN", value: 18, errorMessage: "Must be 18 or older" },
-  { fieldId: "email", type: "REGEX", value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, errorMessage: "Invalid email format" },
+  {
+    fieldId: "username",
+    type: "REQUIRED",
+    errorMessage: "Username is required",
+  },
+  {
+    fieldId: "age",
+    type: "COMPARISON",
+    operator: "GREATER_THAN",
+    value: 18,
+    errorMessage: "Must be 18 or older",
+  },
+  {
+    fieldId: "email",
+    type: "REGEX",
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    errorMessage: "Invalid email format",
+  },
 ];
 
 (async () => {
@@ -230,7 +256,7 @@ const rules = [
     const result = await validator.validateForm(formData, rules);
     console.log(result);
   } catch (error) {
-    console.error('Validation failed:', error);
+    console.error("Validation failed:", error);
   }
 })();
 ```
