@@ -72,9 +72,15 @@ describe("FieldValidator - Dependency Validation", () => {
       dependentFieldId: "parentField",
       dependentOperator: "GREATER_THAN",
       dependentValue: 3,
+      errorMessage: "Field is required due to dependency not being met",
     };
 
     const result = FieldValidator.validateDependency(field, condition, context);
+
+    // Validate that the result is an instance of ValidationError
     expect(result).toBeInstanceOf(ValidationError);
+    expect(result.message).toBe(
+      "Field is required due to dependency not being met"
+    );
   });
 });
