@@ -7,11 +7,13 @@ export class FieldValidator {
   static validateRequired(field, condition) {
     ValidationHelpers.ensureConditionField(condition, "type");
     if (ValidationUtils.isEmpty(field.value)) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage || `${field.fieldId} is required`,
-        VALIDATION_TYPES.REQUIRED
-      );
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message: condition.errorMessage || `${field.fieldId} is required`,
+        type: VALIDATION_TYPES.REQUIRED,
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
     return null;
   }
@@ -19,13 +21,16 @@ export class FieldValidator {
   static validateType(field, condition) {
     ValidationHelpers.ensureConditionField(condition, "expectedType");
     if (!ValidationUtils.validateType(field.value, condition.expectedType)) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage ||
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message:
+          condition.errorMessage ||
           `${field.fieldId} must be of type ${condition.expectedType}`,
-        VALIDATION_TYPES.TYPE_CHECK,
-        { expectedType: condition.expectedType }
-      );
+        type: VALIDATION_TYPES.TYPE_CHECK,
+        details: { expectedType: condition.expectedType },
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
     return null;
   }
@@ -37,12 +42,17 @@ export class FieldValidator {
     if (
       !ValidationUtils.compare(field.value, condition.operator, condition.value)
     ) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage || `${field.fieldId} comparison failed`,
-        VALIDATION_TYPES.COMPARISON,
-        { operator: condition.operator, expectedValue: condition.value }
-      );
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message: condition.errorMessage || `${field.fieldId} comparison failed`,
+        type: VALIDATION_TYPES.COMPARISON,
+        details: {
+          operator: condition.operator,
+          expectedValue: condition.value,
+        },
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
     return null;
   }
@@ -50,52 +60,58 @@ export class FieldValidator {
   static validateDependency(field, condition, context) {
     const dependentField = context.formData?.[condition.dependentFieldId];
 
-    // Check if dependent field is missing
     if (!dependentField) {
-      return new ValidationError(
-        condition.dependentFieldId,
-        `Dependent field ${condition.dependentFieldId} is missing`,
-        VALIDATION_TYPES.DEPENDENCY
-      );
+      return new ValidationError({
+        fieldId: condition.dependentFieldId,
+        message: `Dependent field ${condition.dependentFieldId} is missing`,
+        type: VALIDATION_TYPES.DEPENDENCY,
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
 
-    // Check if dependent field value is invalid
     if (dependentField.value === null || dependentField.value === undefined) {
-      return new ValidationError(
-        condition.dependentFieldId,
-        `Dependent field ${condition.dependentFieldId} has an invalid value`,
-        VALIDATION_TYPES.DEPENDENCY
-      );
+      return new ValidationError({
+        fieldId: condition.dependentFieldId,
+        message: `Dependent field ${condition.dependentFieldId} has an invalid value`,
+        type: VALIDATION_TYPES.DEPENDENCY,
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
 
-    // Validate the dependency condition
     const isDependentValid = ValidationUtils.compare(
       dependentField.value,
       condition.dependentOperator,
       condition.dependentValue
     );
 
-    // If dependency condition is not met and the field value is empty
     if (!isDependentValid) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage ||
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message:
+          condition.errorMessage ||
           `${field.fieldId} is required due to dependency not being met`,
-        VALIDATION_TYPES.DEPENDENCY,
-        { dependentField: condition.dependentFieldId }
-      );
+        type: VALIDATION_TYPES.DEPENDENCY,
+        details: { dependentField: condition.dependentFieldId },
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
 
-    // If dependency condition is met, check if the field value is valid
     if (isDependentValid && ValidationUtils.isEmpty(field.value)) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage ||
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message:
+          condition.errorMessage ||
           `${field.fieldId} is required due to ${condition.dependentFieldId}`,
-        VALIDATION_TYPES.DEPENDENCY,
-        { dependentField: condition.dependentFieldId }
-      );
+        type: VALIDATION_TYPES.DEPENDENCY,
+        details: { dependentField: condition.dependentFieldId },
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
+
     return null;
   }
 
@@ -112,17 +128,20 @@ export class FieldValidator {
       valueLength < condition.minLength ||
       valueLength > condition.maxLength
     ) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage ||
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message:
+          condition.errorMessage ||
           `${field.fieldId} length must be between ${condition.minLength} and ${condition.maxLength}`,
-        VALIDATION_TYPES.LENGTH_CHECK,
-        {
+        type: VALIDATION_TYPES.LENGTH_CHECK,
+        details: {
           minLength: condition.minLength,
           maxLength: condition.maxLength,
           currentLength: valueLength,
-        }
-      );
+        },
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
     return null;
   }
@@ -133,13 +152,16 @@ export class FieldValidator {
     try {
       const regex = new RegExp(condition.value);
       if (!regex.test(String(field.value || ""))) {
-        return new ValidationError(
-          field.fieldId,
-          condition.errorMessage ||
+        return new ValidationError({
+          fieldId: field.fieldId,
+          message:
+            condition.errorMessage ||
             `${field.fieldId} does not match the expected pattern`,
-          VALIDATION_TYPES.REGEX,
-          { pattern: condition.value }
-        );
+          type: VALIDATION_TYPES.REGEX,
+          details: { pattern: condition.value },
+          action: condition.action,
+          actionValue: condition.actionValue,
+        });
       }
     } catch (error) {
       throw new Error(`Invalid regex pattern: ${error.message}`);
@@ -156,14 +178,17 @@ export class FieldValidator {
       (condition.operator === "NOT_EMPTY" && isEmpty) ||
       (condition.operator === "EMPTY" && !isEmpty)
     ) {
-      return new ValidationError(
-        field.fieldId,
-        condition.errorMessage ||
+      return new ValidationError({
+        fieldId: field.fieldId,
+        message:
+          condition.errorMessage ||
           `${field.fieldId} ${
             condition.operator === "EMPTY" ? "must be empty" : "cannot be empty"
           }`,
-        VALIDATION_TYPES.EMPTY_CHECK
-      );
+        type: VALIDATION_TYPES.EMPTY_CHECK,
+        action: condition.action,
+        actionValue: condition.actionValue,
+      });
     }
 
     return null;

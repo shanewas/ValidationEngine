@@ -1,4 +1,3 @@
-// constants/validation-types.js
 export const VALIDATION_TYPES = {
   REQUIRED: 'REQUIRED',
   COMPARISON: 'COMPARISON',
@@ -31,4 +30,10 @@ export const FIELD_TYPES = {
   SELECT: 'select',
   RADIO: 'radio',
   CHECKBOX: 'checkbox'
+};
+
+export const ACTIONS = {
+  REQUIRED: 'REQUIRED',
+  CLEAR_FORMFIELD: 'CLEAR_FORMFIELD',
+  UPDATE_VALUE: 'UPDATE_VALUE'
 };
