@@ -1,5 +1,5 @@
- // models/validation-result.js
- export class ValidationResult {
+// models/validation-result.js
+export class ValidationResult {
   constructor() {
     this.errors = new Map();
   }
@@ -24,6 +24,7 @@
       result.details[fieldId] = errors.map(error => ({
         message: error.message,
         type: error.type,
+        fieldType: error.fieldType,
         details: error.details || {}
       }));
       

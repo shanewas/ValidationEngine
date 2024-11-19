@@ -24,3 +24,11 @@ export const OPERATORS = {
   EMPTY: 'EMPTY',
   NOT_EMPTY: 'NOT_EMPTY'
 };
+
+export const FIELD_TYPES = {
+  TEXT: 'text',
+  NUMBER: 'number',
+  SELECT: 'select',
+  RADIO: 'radio',
+  CHECKBOX: 'checkbox'
+};
