@@ -22,6 +22,16 @@ ValidationUtils.addCustomOperator("MATCH_CUSTOM_PATTERN", (value, pattern) => {
   return value.includes(pattern);
 });
 
+// // Register a custom type for "magicString"
+ValidationUtils.addCustomType("magicString", (value) => {
+  return typeof value === "string" && value.includes("magic");
+});
+
+// // Register a custom type for "positiveInteger"
+ValidationUtils.addCustomType("positiveInteger", (value) => {
+  return typeof value === "number" && Number.isInteger(value) && value > 0;
+});
+
 const formData = {
   name: { fieldId: "name", value: "Jo" }, // Too short
   age: { fieldId: "age", value: "20" }, // Valid, but as a string
@@ -31,11 +41,15 @@ const formData = {
   references: { fieldId: "references", value: "" }, // Missing but required
   preferredJobRole: { fieldId: "preferredJobRole", value: "" }, // Missing but required
   coverLetter: { fieldId: "coverLetter", value: "" }, // Missing, not required in this case,
-  magicField: { fieldId: "magicField", value: "magic1" },
+  magicField: { fieldId: "magicField", value: "magic" },
   customPatternField: {
     fieldId: "customPatternField",
-    value: "this is !",
+    value: "this is magic!",
   },
+  validMagicField: { fieldId: "validMagicField", value: "this is magic" }, // Pass
+  positiveField: { fieldId: "positiveField", value: 42 }, // Pass
+  invalidMagicField: { fieldId: "invalidMagicField", value: "nothing special magic" }, // Fail
+  negativeField: { fieldId: "negativeField", value: -10 }, // Fail
 };
 
 const rules = [
@@ -96,7 +110,7 @@ const rules = [
     type: "REGEX",
     fieldId: "phone",
     value: /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/,
-    errorMessage: "Phone number must follow the format xxx-xxx-xxxx.",
+    errorMessage: "Phone number must follow the format xxx-xxxx-xxxx.",
   },
 
   // Experience validation
@@ -158,6 +172,30 @@ const rules = [
     operator: "MATCH_CUSTOM_PATTERN",
     value: "magic",
     errorMessage: "The field must contain the custom pattern 'magic'.",
+  },
+  {
+    type: "TYPE_CHECK",
+    fieldId: "validMagicField",
+    expectedType: "magicString",
+    errorMessage: "The value must be a string containing 'magic'.",
+  },
+  {
+    type: "TYPE_CHECK",
+    fieldId: "positiveField",
+    expectedType: "positiveInteger",
+    errorMessage: "The value must be a positive integer.",
+  },
+  {
+    type: "TYPE_CHECK",
+    fieldId: "invalidMagicField",
+    expectedType: "magicString",
+    errorMessage: "The value must be a string containing 'magic'.",
+  },
+  {
+    type: "TYPE_CHECK",
+    fieldId: "negativeField",
+    expectedType: "positiveInteger",
+    errorMessage: "The value must be a positive integer.",
   },
 ];
 

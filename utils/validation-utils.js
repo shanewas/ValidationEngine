@@ -7,7 +7,7 @@ import { logger } from "../utils/logger.js";
 export class ValidationUtils {
   // Initialize a static Map for custom operators
   static customOperators = new Map();
-
+  static customTypes = new Map();
   /**
    * Checks if a value is empty (null, undefined, empty string, empty object, or empty array).
    * @param {*} value - The value to check.
@@ -86,8 +86,22 @@ export class ValidationUtils {
       logger.error(
         `Comparison error with operator ${operator}: ${error.message}`
       );
-      throw new Error(`Unsupported operator: ${operator}`);
+      throw new Error(
+        `Comparison error with operator ${operator}: ${error.message}`
+      );
     }
+  }
+
+  /**
+   * Registers a custom type.
+   * @param {string} name - The name of the custom type.
+   * @param {function} implementation - The function implementing the type validation logic.
+   */
+  static addCustomType(name, implementation) {
+    if (!name || typeof implementation !== "function") {
+      throw new Error("Invalid custom type registration.");
+    }
+    this.customTypes.set(name, implementation); // Register the custom type
   }
 
   /**
@@ -124,6 +138,11 @@ export class ValidationUtils {
       return false;
     }
 
+    // Check custom types first
+    if (this.customTypes.has(expectedType)) {
+      return this.customTypes.get(expectedType)(value);
+    }
+
     try {
       switch (expectedType.toLowerCase()) {
         case "string":
@@ -142,11 +161,11 @@ export class ValidationUtils {
           return value instanceof Date || !isNaN(Date.parse(value));
         default:
           logger.warn(`Unsupported type: ${expectedType}`);
-          return false;
+          throw new Error(expectedType);
       }
     } catch (error) {
       logger.error(`Type validation error: ${error.message}`);
-      return false;
+      throw new Error(error.message);
     }
   }
 }

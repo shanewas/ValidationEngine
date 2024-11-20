@@ -144,10 +144,22 @@ export class RuleProcessor {
    * Processes a TYPE_CHECK rule.
    */
   static processTypeCheckRule(rule, fieldValue, context) {
-    if (!ValidationUtils.validateType(fieldValue, rule.expectedType)) {
+    try {
+      if (!ValidationUtils.validateType(fieldValue, rule.expectedType)) {
+        context.addError(rule.fieldId, {
+          message: rule.errorMessage,
+          type: "TYPE_CHECK",
+          details: {
+            expectedType: rule.expectedType,
+            actualType: typeof fieldValue,
+          },
+        });
+      }
+    } catch (error) {
+      // Handle unexpected errors (e.g., unsupported types)
       context.addError(rule.fieldId, {
-        message: rule.errorMessage,
-        type: "TYPE_CHECK",
+        message: `!!!Type validation error: ${error.message}`,
+        type: "TYPE_CHECK_ERROR",
         details: {
           expectedType: rule.expectedType,
           actualType: typeof fieldValue,
