@@ -22,12 +22,12 @@ ValidationUtils.addCustomOperator("MATCH_CUSTOM_PATTERN", (value, pattern) => {
   return value.includes(pattern);
 });
 
-// // Register a custom type for "magicString"
+// Register a custom type for "magicString"
 ValidationUtils.addCustomType("magicString", (value) => {
   return typeof value === "string" && value.includes("magic");
 });
 
-// // Register a custom type for "positiveInteger"
+// Register a custom type for "positiveInteger"
 ValidationUtils.addCustomType("positiveInteger", (value) => {
   return typeof value === "number" && Number.isInteger(value) && value > 0;
 });

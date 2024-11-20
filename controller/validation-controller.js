@@ -9,6 +9,19 @@ export class ValidationController {
   }
 
   /**
+   * Generator function to iterate through formData one field at a time.
+   * @param {Array} formData - The form data array to iterate over.
+   * @returns {Generator} - A generator that yields fields one by one.
+   */
+  *fieldIterator(formData) {
+    if (!Array.isArray(formData)) {
+      throw new Error("formData must be an array.");
+    }
+    for (const field of formData) {
+      yield field; // Yields one field at a time
+    }
+  }
+  /**
    * Validates a single field against specified rules.
    * @param {Object} field - The field to validate.
    * @param {Array} rules - The validation rules to apply.
@@ -33,6 +46,7 @@ export class ValidationController {
    * @param {Array} rules - The validation rules to apply.
    * @returns {Promise<Object>} - The combined validation results.
    */
+
   async validateForm(formData, rules) {
     const validationResult = {
       hasErrors: false,
@@ -60,35 +74,21 @@ export class ValidationController {
       });
     };
 
-    // Ensure formData is valid
-    if (
-      !Array.isArray(formData) || // Check if formData is an array
-      !formData.every(
-        (field) =>
-          field &&
-          typeof field === "object" &&
-          "fieldName" in field && // Validate "fieldName" property
-          "value" in field // Validate "value" property
-      )
-    ) {
-      const errorMessage = "Invalid form data provided";
-
+    if (!Array.isArray(formData)) {
+      const errorMessage = "Invalid form data format. Expected an array.";
       addSystemError(errorMessage);
-
-      this.webhook?.trigger({
-        event: "validation.error",
-        details: validationResult,
-      });
-
       return validationResult;
     }
 
-    // Iterate through each field in formData
-    for (const field of formData) {
+    const fieldIterator = this.fieldIterator(formData);
+    let currentField = fieldIterator.next();
+
+    while (!currentField.done) {
+      const field = currentField.value;
       try {
         const fieldResult = await this.validateField(field, rules);
 
-        if (fieldResult && fieldResult.hasErrors) {
+        if (fieldResult?.hasErrors) {
           validationResult.hasErrors = true;
           validationResult.errorCount += fieldResult.errorCount;
 
@@ -101,17 +101,9 @@ export class ValidationController {
         const errorMessage = `Validation failed for field "${field.fieldName}": ${error.message}`;
         addSystemError(errorMessage);
       }
+
+      currentField = fieldIterator.next(); // Move to the next field
     }
-
-    // Trigger webhook events
-    const event = validationResult.hasErrors
-      ? "validation.error"
-      : "validation.success";
-
-    this.webhook?.trigger({
-      event,
-      details: validationResult,
-    });
 
     return validationResult;
   }
