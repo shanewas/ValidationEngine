@@ -72,7 +72,7 @@ const rules = [ /* JSON Rules */ ];
 const controller = new ValidationController();
 controller
   .validateForm(formData, rules)
-  .then((result) => console.log(result))
+  .then((result) => logger.log(result))
   .catch((error) => console.error(error));
 ```
 
@@ -84,7 +84,7 @@ controller
 
   const controller = new ValidationController();
   controller.validateForm(formData, rules)
-    .then((result) => console.log(result))
+    .then((result) => logger.log(result))
     .catch((error) => console.error(error));
 </script>
 ```
@@ -140,7 +140,7 @@ controller
     if (result.hasErrors) {
       console.error("Validation failed:", result.details);
     } else {
-      console.log("Validation succeeded!");
+      logger.log("Validation succeeded!");
     }
   })
   .catch((error) => console.error("System error:", error));
@@ -268,7 +268,7 @@ Track performance with detailed insights:
 ```javascript
 ValidationEngine.enableMetrics();
 const metrics = ValidationEngine.getMetrics();
-console.log(metrics);
+logger.log(metrics);
 ```
 
 ---

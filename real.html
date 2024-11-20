@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ValidationEngine Test</title>
+  </head>
+  <body>
+    <script src="dist/validation-engine.min.js"></script>
+    <!-- Include the minified file -->
+    <script>
+      // Example usage of the ValidationEngine
+      const formData = {
+        age: 19,
+      };
+
+      const rules = [
+        {
+          ruleId: "rule-1",
+          groupId: "group-1",
+          ruleName: "Guardian Dependency Rule",
+          priority: 1,
+          conditions: [
+            {
+              pdfId: "form-1",
+              fieldId: "guardianName",
+              fieldType: "text",
+              type: "DEPENDENCY",
+              dependentFieldId: "age",
+              dependentOperator: "LESS_THAN",
+              dependentValue: 18,
+              errorMessage: "Guardian name is required for minors.",
+            },
+          ],
+        },
+      ];
+
+      const controller = new ValidationEngine.ValidationController();
+
+      controller
+        .validateForm(formData, rules)
+        .then((result) => {
+          if (result.hasErrors) {
+            console.error(
+              "Validation failed:",
+              JSON.stringify(result.details, null, 2)
+            ); // Pretty-print the error details
+          } else {
+            logger.log("Validation succeeded!");
+          }
+        })
+        .catch((error) =>
+          console.error("Validation encountered an error:", error)
+        );
+    </script>
+  </body>
+</html>

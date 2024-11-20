@@ -1,5 +1,5 @@
 import { ValidationEngine } from "../service/validation-engine.js";
-
+import { logger } from "../utils/logger.js";
 /**
  * Controller responsible for orchestrating validation flow.
  * Manages communication between the form data and validation engine.

@@ -13,15 +13,17 @@ export class ValidationResult {
    * @param {ValidationError} error - The error object.
    */
   addError(fieldId, error) {
+    if (!fieldId || typeof fieldId !== "string") {
+      throw new Error("Invalid field ID for error");
+    }
+    if (!error || typeof error !== "object" || !error.message) {
+      throw new Error("Invalid error parameters");
+    }
+
     if (!this.errors.has(fieldId)) {
       this.errors.set(fieldId, []);
     }
     this.errors.get(fieldId).push(error);
-
-    // Automatically track actions if specified in the error
-    if (error.action) {
-      this.addAction(fieldId, error.action, error.actionValue);
-    }
   }
 
   /**

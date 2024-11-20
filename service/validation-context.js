@@ -1,5 +1,4 @@
 import { ValidationResult } from "../models/validation-result.js";
-import { ValidationError } from "../models/validation-error.js";
 
 /**
  * Context object for managing validation results and intermediate state.
@@ -11,13 +10,15 @@ export class ValidationContext {
     }
 
     this.formData = formData;
-    this.result = new ValidationResult();
-    this.fieldCache = new Map();
+    this.result = new ValidationResult(); // Stores validation errors and actions
+    this.fieldCache = new Map(); // Cache for quick access to field values
     this.messages = []; // Stores messages triggered by validation actions
   }
 
   /**
    * Gets a field's value from the form data, using a cache for efficiency.
+   * @param {string} fieldId - The ID of the field.
+   * @returns {any} - The field value.
    */
   getFieldValue(fieldId) {
     if (!fieldId) {
@@ -36,6 +37,8 @@ export class ValidationContext {
 
   /**
    * Sets a field's value in the form data and updates the cache.
+   * @param {string} fieldId - The ID of the field.
+   * @param {any} value - The new value for the field.
    */
   setFieldValue(fieldId, value) {
     if (!fieldId) {
@@ -53,12 +56,18 @@ export class ValidationContext {
 
   /**
    * Adds an error to the validation results.
+   * @param {string} fieldId - The ID of the field associated with the error.
+   * @param {Object} error - The error object with details.
    */
   addError(fieldId, error) {
-    if (!fieldId || !(error instanceof ValidationError)) {
+    if (!fieldId || typeof fieldId !== "string") {
+      throw new Error("Invalid field ID for error");
+    }
+    if (!error || typeof error !== "object" || !error.message) {
       throw new Error("Invalid error parameters");
     }
 
+    // Use ValidationResult to track errors
     this.result.addError(fieldId, error);
   }
 
@@ -67,5 +76,13 @@ export class ValidationContext {
    */
   clearCache() {
     this.fieldCache.clear();
+  }
+
+  /**
+   * Retrieves the validation results.
+   * @returns {ValidationResult} - The accumulated validation results.
+   */
+  getResults() {
+    return this.result;
   }
 }
