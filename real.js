@@ -5,6 +5,23 @@ import { ValidationController } from "./index.js";
 
 // console.enable();
 
+// Register the IS_MAGIC operator
+ValidationUtils.addCustomOperator("IS_MAGIC", (value, comparisonValue) => {
+  // The value must exactly match 'magic'
+  return value === "magic";
+});
+
+// Register the MATCH_CUSTOM_PATTERN operator
+ValidationUtils.addCustomOperator("MATCH_CUSTOM_PATTERN", (value, pattern) => {
+  // The value must contain the specified pattern
+  if (typeof value !== "string" || typeof pattern !== "string") {
+    throw new Error(
+      "Both the value and pattern must be strings for MATCH_CUSTOM_PATTERN."
+    );
+  }
+  return value.includes(pattern);
+});
+
 const formData = {
   name: { fieldId: "name", value: "Jo" }, // Too short
   age: { fieldId: "age", value: "20" }, // Valid, but as a string
@@ -13,7 +30,12 @@ const formData = {
   experience: { fieldId: "experience", value: 3 }, // Valid
   references: { fieldId: "references", value: "" }, // Missing but required
   preferredJobRole: { fieldId: "preferredJobRole", value: "" }, // Missing but required
-  coverLetter: { fieldId: "coverLetter", value: "" }, // Missing, not required in this case
+  coverLetter: { fieldId: "coverLetter", value: "" }, // Missing, not required in this case,
+  magicField: { fieldId: "magicField", value: "magic1" },
+  customPatternField: {
+    fieldId: "customPatternField",
+    value: "this is !",
+  },
 };
 
 const rules = [
@@ -124,17 +146,29 @@ const rules = [
     errorMessage:
       "Cover Letter is required for applicants with more than 5 years of experience.",
   },
+  {
+    type: "COMPARISON",
+    fieldId: "magicField",
+    operator: "IS_MAGIC",
+    errorMessage: "The value must be 'magic'.",
+  },
+  {
+    type: "COMPARISON",
+    fieldId: "customPatternField",
+    operator: "MATCH_CUSTOM_PATTERN",
+    value: "magic",
+    errorMessage: "The field must contain the custom pattern 'magic'.",
+  },
 ];
 
 const controller = new ValidationController();
 
-// Validate the form
+// Validate the form with the updated rules
 controller
   .validateForm(formData, rules)
   .then((validationResults) => {
     if (validationResults.hasErrors) {
       console.log("Validation Errors:");
-      // Use Object.entries to iterate over details
       Object.entries(validationResults.details).forEach(([fieldId, errors]) => {
         errors.forEach((error) => {
           console.log(`- ${error.message} (Field: ${fieldId})`);

@@ -118,11 +118,24 @@ export class RuleProcessor {
    * Processes a COMPARISON rule.
    */
   static processComparisonRule(rule, fieldValue, context) {
-    if (!ValidationUtils.compare(fieldValue, rule.operator, rule.value)) {
+    try {
+      const isValid = ValidationUtils.compare(
+        fieldValue,
+        rule.operator,
+        rule.value
+      );
+      if (!isValid) {
+        context.addError(rule.fieldId, {
+          message: rule.errorMessage,
+          type: "COMPARISON",
+          details: { operator: rule.operator, value: rule.value },
+        });
+      }
+    } catch (error) {
       context.addError(rule.fieldId, {
-        message: rule.errorMessage,
-        type: "COMPARISON",
-        details: { expected: rule.value, actual: fieldValue },
+        message: `Unsupported operator or error: ${rule.operator}`,
+        type: "OPERATOR_ERROR",
+        details: { operator: rule.operator, error: error.message },
       });
     }
   }

@@ -1,9 +1,13 @@
 import { OPERATORS } from "../constants/validation-types.js";
 import { logger } from "../utils/logger.js";
+
 /**
  * Utility functions for common validation tasks.
  */
 export class ValidationUtils {
+  // Initialize a static Map for custom operators
+  static customOperators = new Map();
+
   /**
    * Checks if a value is empty (null, undefined, empty string, empty object, or empty array).
    * @param {*} value - The value to check.
@@ -20,11 +24,12 @@ export class ValidationUtils {
 
   /**
    * Compares a value with another using the specified operator.
-   * Gracefully handles invalid comparisons and unsupported operators.
+   * Handles invalid comparisons and unsupported operators.
    * @param {*} value - The value to compare.
    * @param {string} operator - The operator to use for comparison.
    * @param {*} comparisonValue - The value to compare against.
    * @returns {boolean} - The result of the comparison.
+   * @throws {Error} - Throws an error for unsupported operators.
    */
   static compare(value, operator, comparisonValue) {
     if (value === null || value === undefined) {
@@ -33,6 +38,12 @@ export class ValidationUtils {
     }
 
     try {
+      if (this.customOperators.has(operator)) {
+        const customOperator = this.customOperators.get(operator);
+        return customOperator(value, comparisonValue);
+      }
+
+      // Handle built-in operators
       switch (operator) {
         case OPERATORS.EQUALS:
           return value === comparisonValue;
@@ -68,20 +79,41 @@ export class ValidationUtils {
         case OPERATORS.NOT_EMPTY:
           return !this.isEmpty(value);
         default:
-          logger.warn(`Unsupported operator: ${operator}`);
-          return false;
+          logger.error(`Unsupported operator: ${operator}`);
+          throw new Error(`Unsupported operator: ${operator}`);
       }
     } catch (error) {
       logger.error(
         `Comparison error with operator ${operator}: ${error.message}`
       );
-      return false;
+      throw new Error(`Unsupported operator: ${operator}`);
     }
   }
 
   /**
+   * Registers a custom operator.
+   * @param {string} name - The name of the custom operator.
+   * @param {function} implementation - The function implementing the operator logic.
+   * @throws {Error} - If the operator name or implementation is invalid.
+   */
+  static addCustomOperator(name, implementation) {
+    if (!name || typeof name !== "string") {
+      throw new Error("Custom operator name must be a valid string.");
+    }
+    if (typeof implementation !== "function") {
+      throw new Error("Custom operator implementation must be a function.");
+    }
+    if (this.customOperators.has(name)) {
+      throw new Error(`Custom operator '${name}' already exists.`);
+    }
+
+    this.customOperators.set(name, implementation);
+    logger.log(`Custom operator '${name}' registered successfully.`);
+  }
+
+  /**
    * Validates the type of a value against the expected type.
-   * Gracefully handles unexpected inputs and unsupported types.
+   * Handles unexpected inputs and unsupported types gracefully.
    * @param {*} value - The value to validate.
    * @param {string} expectedType - The expected type.
    * @returns {boolean} - Whether the value matches the expected type.
