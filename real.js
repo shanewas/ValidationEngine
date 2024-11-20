@@ -32,25 +32,22 @@ ValidationUtils.addCustomType("positiveInteger", (value) => {
   return typeof value === "number" && Number.isInteger(value) && value > 0;
 });
 
-const formData = {
-  name: { fieldId: "name", value: "Jo" }, // Too short
-  age: { fieldId: "age", value: "20" }, // Valid, but as a string
-  email: { fieldId: "email", value: "invalid-email" }, // Invalid format
-  phone: { fieldId: "phone", value: "1234567890" }, // Incorrect format
-  experience: { fieldId: "experience", value: 3 }, // Valid
-  references: { fieldId: "references", value: "" }, // Missing but required
-  preferredJobRole: { fieldId: "preferredJobRole", value: "" }, // Missing but required
-  coverLetter: { fieldId: "coverLetter", value: "" }, // Missing, not required in this case,
-  magicField: { fieldId: "magicField", value: "magic" },
-  customPatternField: {
-    fieldId: "customPatternField",
-    value: "this is magic!",
-  },
-  validMagicField: { fieldId: "validMagicField", value: "this is magic" }, // Pass
-  positiveField: { fieldId: "positiveField", value: 42 }, // Pass
-  invalidMagicField: { fieldId: "invalidMagicField", value: "nothing special magic" }, // Fail
-  negativeField: { fieldId: "negativeField", value: -10 }, // Fail
-};
+const formData = [
+  { fieldName: "name", value: "Jo" }, // Too short
+  { fieldName: "age", value: "20" }, // Valid, but as a string
+  { fieldName: "email", value: "invalid-email" }, // Invalid format
+  { fieldName: "phone", value: "1234567890" }, // Incorrect format
+  { fieldName: "experience", value: 3 }, // Valid
+  { fieldName: "references", value: "" }, // Missing but required
+  { fieldName: "preferredJobRole", value: "" }, // Missing but required
+  { fieldName: "coverLetter", value: "" }, // Missing, not required in this case
+  { fieldName: "magicField", value: "magic" },
+  { fieldName: "customPatternField", value: "this is magic!" },
+  { fieldName: "validMagicField", value: "this is magic!" }, // Pass
+  { fieldName: "positiveField", value: 42 }, // Pass
+  { fieldName: "invalidMagicField", value: "nothing special" }, // Fail
+  { fieldName: "negativeField", value: -10 }, // Fail
+];
 
 const rules = [
   // Name validation
@@ -177,7 +174,7 @@ const rules = [
     type: "TYPE_CHECK",
     fieldId: "validMagicField",
     expectedType: "magicString",
-    errorMessage: "The value must be a string containing 'magic'.",
+    errorMessage: "The value must be a magicString type.",
   },
   {
     type: "TYPE_CHECK",
@@ -189,7 +186,7 @@ const rules = [
     type: "TYPE_CHECK",
     fieldId: "invalidMagicField",
     expectedType: "magicString",
-    errorMessage: "The value must be a string containing 'magic'.",
+    errorMessage: "The value must be a magicString type.",
   },
   {
     type: "TYPE_CHECK",
