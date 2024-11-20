@@ -1,264 +1,282 @@
-# @shanewas/form-validation
+# **@shanewas/form-validation**
 
-[![npm version](https://img.shields.io/npm/v/@shanewas/form-validation.svg)](https://www.npmjs.com/package/@shanewas/form-validation)  
-[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)  
-[![Node.js Version](https://img.shields.io/badge/node-v22.11.0-green.svg)](https://nodejs.org)
-
-A powerful and flexible validation engine for forms with support for complex rules, dependencies, type validation, and custom validation logic.
+A flexible and enterprise-ready validation framework designed to handle complex form validations. It supports robust validation types, dependency checks, and customizable workflows.
 
 ---
 
-## Features
-
-- **Comprehensive Validation Types**: Supports required fields, comparisons, dependencies, type checking, regex, and more.
-- **Flexible Actions**: Execute form actions like CLEAR_FORMFIELD, UPDATE_VALUE, or custom actions based on validations.
-- **Complex Field Dependencies**: Define validations based on the values of other fields.
-- **Custom Validations**: Implement application-specific validation logic.
-- **Detailed Error Reporting**: Easy-to-understand validation results.
-- **Flexible Rule Structure**: Configure validations using a simple and extensible rule schema.
-- **Works Everywhere**: Compatible with both Node.js and browsers.
+## **Features**
+- **Extensive Validation Types**: Includes `REQUIRED`, `COMPARISON`, `DEPENDENCY`, `REGEX`, `TYPE_CHECK`, and more.
+- **Dependency Validation**: Ensures fields are validated based on related fields.
+- **Asynchronous Validation**: Supports async operations and webhooks for dynamic validations.
+- **Custom Operators**: Allows you to define your own operators for specific use cases.
+- **Rule Inheritance**: Enables reusable and extendable rule templates.
+- **Multi-Language Support**: Fully supports English and Japanese.
+- **Performance Metrics**: Tracks and optimizes validation performance.
+- **Customizable Logging**: Provides detailed logs with adjustable output formats.
+- **Schema Validation**: Validates JSON and YAML rule definitions.
+- **Standalone or NPM Module**: Usable in both environments seamlessly.
 
 ---
 
-## Installation
+## **Installation**
 
-Install via npm:
-
+### Using NPM
 ```bash
 npm install @shanewas/form-validation
 ```
 
+### Standalone
+Include the compiled JavaScript file in your project:
+```html
+<script src="validation-engine.min.js"></script>
+```
+
 ---
 
-## Quick Start
+## **Basic Usage**
 
+### **1. Defining Rules**
+Validation rules are defined in JSON format:
+```json
+{
+  "rules": [
+    {
+      "ruleId": "rule-1",
+      "groupId": "group-1",
+      "ruleName": "Age Validation",
+      "priority": 1,
+      "conditions": [
+        {
+          "pdfId": "form-1",
+          "fieldId": "age",
+          "fieldType": "number",
+          "type": "COMPARISON",
+          "operator": "GREATER_THAN",
+          "value": 18,
+          "errorMessage": "Age must be greater than 18"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### **2. Validating Form Data**
+#### With NPM:
 ```javascript
 import { ValidationController } from "@shanewas/form-validation";
 
-// Initialize the validator
-const validator = new ValidationController();
+const formData = { age: 16 };
+const rules = [ /* JSON Rules */ ];
 
-// Define form data
+const controller = new ValidationController();
+controller
+  .validateForm(formData, rules)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+#### Standalone:
+```html
+<script>
+  const formData = { age: 16 };
+  const rules = [ /* JSON Rules */ ];
+
+  const controller = new ValidationController();
+  controller.validateForm(formData, rules)
+    .then((result) => console.log(result))
+    .catch((error) => console.error(error));
+</script>
+```
+
+---
+
+## **Advanced Features**
+
+### **1. Dependency Validation**
+Dependency validation ensures that a field is validated based on the value of another field. For example, if a guardianÅfs name is required when the applicant is a minor.
+
+#### **Example**
+Define a dependency rule:
+```json
+{
+  "rules": [
+    {
+      "ruleId": "dependency-rule-1",
+      "groupId": "group-1",
+      "ruleName": "Guardian Dependency Rule",
+      "priority": 1,
+      "conditions": [
+        {
+          "pdfId": "form-1",
+          "fieldId": "guardianName",
+          "fieldType": "text",
+          "type": "DEPENDENCY",
+          "dependentFieldId": "applicantAge",
+          "dependentOperator": "LESS_THAN",
+          "dependentValue": 18,
+          "errorMessage": "Guardian name is required for minors."
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### **Usage in Code**
+```javascript
 const formData = {
-  name: { fieldId: "name", value: "john" },
-  age: { fieldId: "age", value: 18 },
-  email: { fieldId: "email", value: "john@example.com" },
+  applicantAge: 16, // Dependent field
+  guardianName: ""  // Target field
 };
 
-// Define validation rules
-const rules = [
-  {
-    ruleId: "userValidation",
-    conditions: [
-      {
-        fieldId: "name",
-        type: "REQUIRED",
-        errorMessage: "Name is required",
-      },
-      {
-        fieldId: "age",
-        type: "COMPARISON",
-        operator: "GREATER_THAN",
-        value: 17,
-        errorMessage: "Must be 18 or older",
-      },
-    ],
-  },
-];
+const rules = [ /* Dependency rule defined above */ ];
 
-// Validate
-(async () => {
-  try {
-    const result = await validator.validateForm(formData, rules);
-    console.log(result);
-  } catch (error) {
-    console.error("Validation failed:", error);
+const controller = new ValidationController();
+
+controller
+  .validateForm(formData, rules)
+  .then((result) => {
+    if (result.hasErrors) {
+      console.error("Validation failed:", result.details);
+    } else {
+      console.log("Validation succeeded!");
+    }
+  })
+  .catch((error) => console.error("System error:", error));
+```
+
+---
+
+### **2. Custom Operators**
+Add custom operators using `ValidationUtils`:
+```javascript
+ValidationUtils.addCustomOperator("INCLUDES", (value, comparisonValue) => {
+  return Array.isArray(comparisonValue) && comparisonValue.includes(value);
+});
+```
+
+---
+
+### **3. Webhook Support**
+You can validate asynchronously with external services:
+```javascript
+{
+  "type": "CUSTOM",
+  "validate": async (field, context) => {
+    const response = await fetch("https://api.example.com/validate", {
+      method: "POST",
+      body: JSON.stringify({ field })
+    });
+    return response.ok ? null : "Validation failed";
   }
-})();
-```
-
----
-
-## Validation Types
-
-- **`REQUIRED`**: Ensure the field is not empty.
-- **`COMPARISON`**: Compare field values using supported operators.
-- **`DEPENDENCY`**: Validate a field based on another field's value.
-- **`TYPE_CHECK`**: Check the field value's data type.
-- **`LENGTH_CHECK`**: Validate the length of string or array fields.
-- **`EMPTY_CHECK`**: Ensure fields are empty or non-empty.
-- **`REGEX`**: Match field values against regular expressions.
-- **`CUSTOM`**: Apply user-defined validation functions.
-
----
-
-## Rule Structure
-
-Rules are defined as objects and support a wide range of properties:
-
-{
-ruleId: string,
-conditions: [
-{
-fieldId: string,
-type: string,
-operator: string,
-value: any,
-expectedType: string,
-minLength: number,
-maxLength: number,
-dependentFieldId: string,
-dependentOperator: string,
-dependentValue: any,
-action: string, // e.g., "CLEAR_FORMFIELD", "UPDATE_VALUE"
-actionValue: any, // Additional data for the action
-errorMessage: string,
-description: string,
-},
-],
-}
-
----
-
-## Actions
-
-The following actions are supported for rule conditions:
-
-- **`CLEAR_FORMFIELD`**: Clears the value of the specified field.
-- **`UPDATE_VALUE`**: Updates the field's value to a specified value.
-- **Custom Actions**: Define custom actions in your implementation.
-
----
-
-## Operators
-
-The following operators are supported in `COMPARISON` and `DEPENDENCY` validations:
-
-- **`EQUALS`**
-- **`NOT_EQUALS`**
-- **`GREATER_THAN`**
-- **`LESS_THAN`**
-- **`GREATER_THAN_OR_EQUAL`**
-- **`LESS_THAN_OR_EQUAL`**
-- **`CONTAINS`**
-- **`STARTS_WITH`**
-- **`ENDS_WITH`**
-- **`BETWEEN`**
-- **`EMPTY`**
-- **`NOT_EMPTY`**
-
----
-
-## Advanced Usage
-
-### Custom Validation
-
-You can define your own validation logic using the `CUSTOM` type:
-
-```javascript
-const rules = [
-  {
-    ruleId: "passwordValidation",
-    conditions: [
-      {
-        fieldId: "password",
-        type: "CUSTOM",
-        customFunction: async (value, formData) => {
-          return value.length < 8
-            ? "Password must be at least 8 characters"
-            : null;
-        },
-      },
-    ],
-  },
-];
-```
-
----
-
-### Dependent Fields
-
-Validate a field based on the value of another field using `DEPENDENCY`:
-
-```javascript
-const rules = [
-  {
-    ruleId: "dependencyCheck",
-    conditions: [
-      {
-        fieldId: "state",
-        type: "DEPENDENCY",
-        dependentFieldId: "country",
-        dependentOperator: "EQUALS",
-        dependentValue: "USA",
-        errorMessage: "State is required for USA",
-      },
-    ],
-  },
-];
-```
-
----
-
-### Validation Result
-
-The validation result provides detailed information about errors:
-
-```javascript
-{
-  hasErrors: true,
-  errorCount: 2,
-  details: {
-    name: [{ message: "Name is required", type: "REQUIRED" }],
-    age: [{ message: "Must be 18 or older", type: "COMPARISON" }],
-  },
-  summary: [
-    { type: "error", fieldId: "name", message: "Name is required" },
-    { type: "error", fieldId: "age", message: "Must be 18 or older" },
-  ],
 }
 ```
 
 ---
 
-### Example Validation with All Types
+### **4. Rule Templates**
+Define reusable templates:
+```json
+{
+  "template": "ageValidation",
+  "fields": ["age"],
+  "conditions": [
+    {
+      "operator": "GREATER_THAN",
+      "value": 18,
+      "errorMessage": "Age must be greater than 18"
+    }
+  ]
+}
+```
 
-```javascript
-const formData = {
-  username: { fieldId: "username", value: "" },
-  age: { fieldId: "age", value: 17 },
-  email: { fieldId: "email", value: "invalid-email" },
-};
+---
 
-const rules = [
-  {
-    fieldId: "username",
-    type: "REQUIRED",
-    errorMessage: "Username is required",
-  },
-  {
-    fieldId: "age",
-    type: "COMPARISON",
-    operator: "GREATER_THAN",
-    value: 18,
-    errorMessage: "Must be 18 or older",
-  },
-  {
-    fieldId: "email",
-    type: "REGEX",
-    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    errorMessage: "Invalid email format",
-  },
-];
-
-(async () => {
-  try {
-    const result = await validator.validateForm(formData, rules);
-    console.log(result);
-  } catch (error) {
-    console.error("Validation failed:", error);
+### **5. Multi-Language Errors**
+Provide errors in multiple languages:
+```json
+{
+  "errorMessage": {
+    "en": "Age must be greater than 18",
+    "jp": "îNóÓÇÕ18çŒà»è„Ç≈Ç»ÇØÇÍÇŒÇ»ÇËÇ‹ÇπÇÒ"
   }
-})();
+}
+```
+
+---
+
+### **6. Logging**
+Configure logging output:
+```javascript
+import { ValidationLogger } from "@shanewas/form-validation";
+
+ValidationLogger.configure({
+  level: "debug", // "info", "warn", "error"
+  output: "file", // "console", "file"
+  filePath: "/logs/validation.log"
+});
+```
+
+---
+
+## **API Reference**
+
+### **ValidationController**
+- `validateForm(formData, rules)`: Validates form data against rules.
+- `reset()`: Resets internal state for reuse.
+
+---
+
+### **Validation Types**
+| Type           | Description                              |
+|----------------|------------------------------------------|
+| `REQUIRED`     | Ensures the field is filled.             |
+| `COMPARISON`   | Validates using operators.               |
+| `DEPENDENCY`   | Validates based on related field values. |
+| `TYPE_CHECK`   | Ensures the value matches a type.        |
+| `REGEX`        | Validates using regular expressions.     |
+
+---
+
+HereÅfs the complete list of operators with their descriptions, as defined in your system:
+
+---
+
+### **Operators**
+| Operator                  | Description                                                  |
+|---------------------------|--------------------------------------------------------------|
+| `EQUALS`                  | Checks if the field value is equal to the comparison value.  |
+| `NOT_EQUALS`              | Checks if the field value is not equal to the comparison value. |
+| `GREATER_THAN`            | Checks if the field value is greater than the comparison value. |
+| `LESS_THAN`               | Checks if the field value is less than the comparison value. |
+| `GREATER_THAN_OR_EQUAL`   | Checks if the field value is greater than or equal to the comparison value. |
+| `LESS_THAN_OR_EQUAL`      | Checks if the field value is less than or equal to the comparison value. |
+| `CONTAINS`                | Checks if the field value contains the comparison value as a substring. |
+| `STARTS_WITH`             | Checks if the field value starts with the comparison value. |
+| `ENDS_WITH`               | Checks if the field value ends with the comparison value.   |
+| `BETWEEN`                 | Checks if the field value lies within the range of two values (inclusive). |
+| `BEFORE`                  | Checks if the field value is before the comparison date (for date values). |
+| `AFTER`                   | Checks if the field value is after the comparison date (for date values). |
+| `EMPTY`                   | Checks if the field value is empty (null, undefined, or ""). |
+| `NOT_EMPTY`               | Checks if the field value is not empty.                     |
+
+---
+
+## **Performance Metrics**
+Track performance with detailed insights:
+```javascript
+ValidationEngine.enableMetrics();
+const metrics = ValidationEngine.getMetrics();
+console.log(metrics);
+```
+
+---
+
+## **Testing**
+Run tests for your validation rules:
+```bash
+npm test
 ```
 
 ---
@@ -288,7 +306,3 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 - [Documentation](https://github.com/shanewas/ValidationEngine/wiki)
 
 ---
-
-## Acknowledgments
-
-Special thanks to all contributors for their efforts in making this library robust and versatile!

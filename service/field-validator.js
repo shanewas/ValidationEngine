@@ -3,7 +3,13 @@ import { ValidationUtils } from "../utils/validation-utils.js";
 import { VALIDATION_TYPES } from "../constants/validation-types.js";
 import { ValidationHelpers } from "../utils/validation-helpers.js";
 
+/**
+ * Handles individual field validation logic for various validation types.
+ */
 export class FieldValidator {
+  /**
+   * Validates that a field is required.
+   */
   static validateRequired(field, condition) {
     ValidationHelpers.ensureConditionField(condition, "type");
     if (ValidationUtils.isEmpty(field.value)) {
@@ -18,6 +24,9 @@ export class FieldValidator {
     return null;
   }
 
+  /**
+   * Validates the type of a field's value.
+   */
   static validateType(field, condition) {
     ValidationHelpers.ensureConditionField(condition, "expectedType");
     if (!ValidationUtils.validateType(field.value, condition.expectedType)) {
@@ -35,10 +44,11 @@ export class FieldValidator {
     return null;
   }
 
+  /**
+   * Compares a field's value against a specified condition.
+   */
   static validateComparison(field, condition) {
-    ValidationHelpers.ensureConditionField(condition, "operator");
-    ValidationHelpers.ensureConditionField(condition, "value");
-
+    ValidationHelpers.ensureConditionFields(condition, ["operator", "value"]);
     if (
       !ValidationUtils.compare(field.value, condition.operator, condition.value)
     ) {
@@ -57,23 +67,15 @@ export class FieldValidator {
     return null;
   }
 
+  /**
+   * Validates a dependency between fields.
+   */
   static validateDependency(field, condition, context) {
     const dependentField = context.formData?.[condition.dependentFieldId];
-
     if (!dependentField) {
       return new ValidationError({
         fieldId: condition.dependentFieldId,
         message: `Dependent field ${condition.dependentFieldId} is missing`,
-        type: VALIDATION_TYPES.DEPENDENCY,
-        action: condition.action,
-        actionValue: condition.actionValue,
-      });
-    }
-
-    if (dependentField.value === null || dependentField.value === undefined) {
-      return new ValidationError({
-        fieldId: condition.dependentFieldId,
-        message: `Dependent field ${condition.dependentFieldId} has an invalid value`,
         type: VALIDATION_TYPES.DEPENDENCY,
         action: condition.action,
         actionValue: condition.actionValue,
@@ -98,36 +100,20 @@ export class FieldValidator {
         actionValue: condition.actionValue,
       });
     }
-
-    if (isDependentValid && ValidationUtils.isEmpty(field.value)) {
-      return new ValidationError({
-        fieldId: field.fieldId,
-        message:
-          condition.errorMessage ||
-          `${field.fieldId} is required due to ${condition.dependentFieldId}`,
-        type: VALIDATION_TYPES.DEPENDENCY,
-        details: { dependentField: condition.dependentFieldId },
-        action: condition.action,
-        actionValue: condition.actionValue,
-      });
-    }
-
     return null;
   }
 
+  /**
+   * Validates the length of a field's value.
+   */
   static validateLength(field, condition) {
-    ValidationHelpers.ensureConditionField(condition, "minLength");
-    ValidationHelpers.ensureConditionField(condition, "maxLength");
-
+    ValidationHelpers.ensureConditionFields(condition, ["minLength", "maxLength"]);
     if (condition.minLength > condition.maxLength) {
       throw new Error("minLength cannot be greater than maxLength.");
     }
 
     const valueLength = String(field.value || "").length;
-    if (
-      valueLength < condition.minLength ||
-      valueLength > condition.maxLength
-    ) {
+    if (valueLength < condition.minLength || valueLength > condition.maxLength) {
       return new ValidationError({
         fieldId: field.fieldId,
         message:
@@ -146,6 +132,9 @@ export class FieldValidator {
     return null;
   }
 
+  /**
+   * Validates a field's value against a regex pattern.
+   */
   static validateRegex(field, condition) {
     ValidationHelpers.ensureConditionField(condition, "value");
 
@@ -169,11 +158,13 @@ export class FieldValidator {
     return null;
   }
 
+  /**
+   * Validates if a field is empty or not.
+   */
   static validateEmpty(field, condition) {
     ValidationHelpers.ensureConditionField(condition, "operator");
 
     const isEmpty = ValidationUtils.isEmpty(field.value);
-
     if (
       (condition.operator === "NOT_EMPTY" && isEmpty) ||
       (condition.operator === "EMPTY" && !isEmpty)
@@ -190,7 +181,6 @@ export class FieldValidator {
         actionValue: condition.actionValue,
       });
     }
-
     return null;
   }
 }

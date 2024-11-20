@@ -1,6 +1,9 @@
 import { ValidationResult } from "../models/validation-result.js";
 import { ValidationError } from "../models/validation-error.js";
 
+/**
+ * Context object for managing validation results and intermediate state.
+ */
 export class ValidationContext {
   constructor(formData) {
     if (!formData || typeof formData !== "object") {
@@ -10,13 +13,11 @@ export class ValidationContext {
     this.formData = formData;
     this.result = new ValidationResult();
     this.fieldCache = new Map();
-    this.messages = []; // To store messages triggered by actions
+    this.messages = []; // Stores messages triggered by validation actions
   }
 
   /**
-   * Gets the value of a field from the form data.
-   * @param {string} fieldId - The ID of the field.
-   * @returns {*} - The field value or null if not found.
+   * Gets a field's value from the form data, using a cache for efficiency.
    */
   getFieldValue(fieldId) {
     if (!fieldId) {
@@ -34,9 +35,7 @@ export class ValidationContext {
   }
 
   /**
-   * Sets the value of a field in the form data.
-   * @param {string} fieldId - The ID of the field.
-   * @param {*} value - The new value for the field.
+   * Sets a field's value in the form data and updates the cache.
    */
   setFieldValue(fieldId, value) {
     if (!fieldId) {
@@ -49,14 +48,11 @@ export class ValidationContext {
       this.formData[fieldId].value = value;
     }
 
-    // Update cache
     this.fieldCache.set(fieldId, value);
   }
 
   /**
    * Adds an error to the validation results.
-   * @param {string} fieldId - The ID of the field with the error.
-   * @param {ValidationError} error - The validation error.
    */
   addError(fieldId, error) {
     if (!fieldId || !(error instanceof ValidationError)) {
@@ -67,44 +63,9 @@ export class ValidationContext {
   }
 
   /**
-   * Adds a message triggered by a validation action.
-   * @param {string} fieldId - The ID of the field related to the message.
-   * @param {string} message - The message to add.
-   */
-  addMessage(fieldId, message) {
-    if (!fieldId || typeof message !== "string") {
-      throw new Error("Invalid message parameters");
-    }
-
-    this.messages.push({ fieldId, message });
-  }
-
-  /**
-   * Gets all validation results, including errors and messages.
-   * @returns {Object} - Formatted validation results.
-   */
-  getResults() {
-    const results = this.result.formatResults();
-    if (this.messages.length > 0) {
-      results.messages = this.messages;
-    }
-    return results;
-  }
-
-  /**
-   * Clears the field value cache.
+   * Clears all cached field values.
    */
   clearCache() {
     this.fieldCache.clear();
-  }
-
-  /**
-   * Resets the form data to its initial state.
-   */
-  resetForm() {
-    this.formData = {};
-    this.result = new ValidationResult();
-    this.clearCache();
-    this.messages = [];
   }
 }

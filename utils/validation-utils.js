@@ -1,5 +1,8 @@
 import { OPERATORS } from "../constants/validation-types.js";
 
+/**
+ * Utility functions for common validation tasks.
+ */
 export class ValidationUtils {
   /**
    * Checks if a value is empty (null, undefined, empty string, empty object, or empty array).
@@ -16,12 +19,12 @@ export class ValidationUtils {
   }
 
   /**
-   * Compares a value with a comparison value using the specified operator.
+   * Compares a value with another using the specified operator.
    * @param {*} value - The value to compare.
    * @param {string} operator - The operator to use for comparison.
    * @param {*} comparisonValue - The value to compare against.
    * @returns {boolean} - The result of the comparison.
-   * @throws {Error} - If an unsupported operator is used or invalid input is provided.
+   * @throws {Error} - If an unsupported operator is used.
    */
   static compare(value, operator, comparisonValue) {
     if (value === null || value === undefined) return false;
@@ -48,9 +51,7 @@ export class ValidationUtils {
           return String(value).endsWith(String(comparisonValue));
         case OPERATORS.BETWEEN:
           if (!Array.isArray(comparisonValue) || comparisonValue.length !== 2) {
-            throw new Error(
-              "BETWEEN operator requires an array of exactly two values"
-            );
+            throw new Error("BETWEEN operator requires an array of two values");
           }
           return (
             Number(value) >= Number(comparisonValue[0]) &&
@@ -65,17 +66,17 @@ export class ValidationUtils {
       }
     } catch (error) {
       throw new Error(
-        `Comparison error for operator ${operator}: ${error.message}`
+        `Comparison error with operator ${operator}: ${error.message}`
       );
     }
   }
 
   /**
-   * Validates the type of a value against an expected type.
+   * Validates the type of a value against the expected type.
    * @param {*} value - The value to validate.
    * @param {string} expectedType - The expected type.
    * @returns {boolean} - Whether the value matches the expected type.
-   * @throws {Error} - If an unsupported type is specified.
+   * @throws {Error} - If the expected type is unsupported.
    */
   static validateType(value, expectedType) {
     if (!expectedType) {
