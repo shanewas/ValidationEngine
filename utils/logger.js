@@ -18,28 +18,57 @@ class Logger {
   }
 
   /**
-   * Logs a message if logging is enabled.
-   * Uses console.log directly to avoid recursion.
+   * Logs a general message if logging is enabled.
    * @param {string} message - The message to log.
    * @param {...any} args - Additional arguments.
    */
   log(message, ...args) {
     if (this.isEnabled) {
-      // Use console.log directly to avoid recursion
       Function.prototype.apply.call(console.log, console, [message, ...args]);
     }
   }
 
   /**
-   * Logs an error if logging is enabled.
-   * Uses console.error directly to avoid recursion.
+   * Logs an error message if logging is enabled.
    * @param {string} message - The error message to log.
    * @param {...any} args - Additional arguments.
    */
   error(message, ...args) {
     if (this.isEnabled) {
-      // Use console.error directly to avoid recursion
       Function.prototype.apply.call(console.error, console, [message, ...args]);
+    }
+  }
+
+  /**
+   * Logs a warning message if logging is enabled.
+   * @param {string} message - The warning message to log.
+   * @param {...any} args - Additional arguments.
+   */
+  warn(message, ...args) {
+    if (this.isEnabled) {
+      Function.prototype.apply.call(console.warn, console, [message, ...args]);
+    }
+  }
+
+  /**
+   * Logs an informational message if logging is enabled.
+   * @param {string} message - The informational message to log.
+   * @param {...any} args - Additional arguments.
+   */
+  info(message, ...args) {
+    if (this.isEnabled) {
+      Function.prototype.apply.call(console.info, console, [message, ...args]);
+    }
+  }
+
+  /**
+   * Logs a debug message if logging is enabled.
+   * @param {string} message - The debug message to log.
+   * @param {...any} args - Additional arguments.
+   */
+  debug(message, ...args) {
+    if (this.isEnabled) {
+      Function.prototype.apply.call(console.debug, console, [message, ...args]);
     }
   }
 }

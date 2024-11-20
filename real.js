@@ -1,9 +1,9 @@
 import { ValidationUtils } from "./utils/validation-utils.js";
 import { OPERATORS } from "./constants/validation-types.js";
 import { ValidationController } from "./index.js";
-// import { logger } from "./utils/logger.js";
+// import { console } from "./utils/console.js";
 
-// logger.enable();
+// console.enable();
 
 const formData = {
   name: { fieldId: "name", value: "Jo" }, // Too short

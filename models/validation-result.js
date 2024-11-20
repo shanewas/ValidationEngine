@@ -14,16 +14,23 @@ export class ValidationResult {
    */
   addError(fieldId, error) {
     if (!fieldId || typeof fieldId !== "string") {
-      throw new Error("Invalid field ID for error");
+      console.warn("Invalid field ID for error. Error not added.");
+      return;
     }
     if (!error || typeof error !== "object" || !error.message) {
-      throw new Error("Invalid error parameters");
+      console.warn("Invalid error object provided. Error not added.");
+      return;
     }
 
     if (!this.errors.has(fieldId)) {
       this.errors.set(fieldId, []);
     }
-    this.errors.get(fieldId).push(error);
+
+    // Avoid duplicate errors
+    const existingErrors = this.errors.get(fieldId);
+    if (!existingErrors.some((e) => e.message === error.message)) {
+      existingErrors.push(error);
+    }
   }
 
   /**
@@ -33,9 +40,19 @@ export class ValidationResult {
    * @param {any} actionValue - Optional value associated with the action.
    */
   addAction(fieldId, action, actionValue = null) {
+    if (!fieldId || typeof fieldId !== "string") {
+      console.warn("Invalid field ID for action. Action not added.");
+      return;
+    }
+    if (!action || typeof action !== "string") {
+      console.warn("Invalid action type. Action not added.");
+      return;
+    }
+
     if (!this.actions.has(fieldId)) {
       this.actions.set(fieldId, []);
     }
+
     this.actions.get(fieldId).push({ action, actionValue });
   }
 
@@ -57,8 +74,8 @@ export class ValidationResult {
       result.errorCount += errors.length;
       result.details[fieldId] = errors.map((error) => ({
         message: error.message,
-        type: error.type,
-        fieldType: error.fieldType,
+        type: error.type || "UNKNOWN",
+        fieldType: error.fieldType || null,
         details: error.details || {},
         action: error.action || null,
         actionValue: error.actionValue || null,
@@ -76,7 +93,10 @@ export class ValidationResult {
 
     // Process actions
     this.actions.forEach((actions, fieldId) => {
-      result.actions[fieldId] = actions;
+      result.actions[fieldId] = actions.map((action) => ({
+        action: action.action,
+        actionValue: action.actionValue,
+      }));
     });
 
     return result;

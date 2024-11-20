@@ -1,15 +1,17 @@
 import { ValidationResult } from "../models/validation-result.js";
-
+import { logger } from "../utils/logger.js";
 /**
  * Context object for managing validation results and intermediate state.
  */
 export class ValidationContext {
   constructor(formData) {
     if (!formData || typeof formData !== "object") {
-      throw new Error("Invalid form data");
+      logger.warn("Invalid or missing form data provided");
+      this.formData = {}; // Initialize with an empty object to prevent crashes
+    } else {
+      this.formData = formData;
     }
 
-    this.formData = formData;
     this.result = new ValidationResult(); // Stores validation errors and actions
     this.fieldCache = new Map(); // Cache for quick access to field values
     this.messages = []; // Stores messages triggered by validation actions
@@ -18,11 +20,12 @@ export class ValidationContext {
   /**
    * Gets a field's value from the form data, using a cache for efficiency.
    * @param {string} fieldId - The ID of the field.
-   * @returns {any} - The field value.
+   * @returns {any} - The field value or null if the field does not exist.
    */
   getFieldValue(fieldId) {
     if (!fieldId) {
-      throw new Error("Field ID is required");
+      logger.warn("Field ID is required but was not provided");
+      return null;
     }
 
     if (this.fieldCache.has(fieldId)) {
@@ -30,7 +33,12 @@ export class ValidationContext {
     }
 
     const field = this.formData[fieldId];
-    const value = field ? field.value : null;
+    if (!field) {
+      logger.warn(`Field with ID "${fieldId}" does not exist in the form data`);
+      return null;
+    }
+
+    const value = field.value || null;
     this.fieldCache.set(fieldId, value);
     return value;
   }
@@ -42,7 +50,8 @@ export class ValidationContext {
    */
   setFieldValue(fieldId, value) {
     if (!fieldId) {
-      throw new Error("Field ID is required");
+      logger.warn("Field ID is required but was not provided");
+      return;
     }
 
     if (!this.formData[fieldId]) {
@@ -61,10 +70,13 @@ export class ValidationContext {
    */
   addError(fieldId, error) {
     if (!fieldId || typeof fieldId !== "string") {
-      throw new Error("Invalid field ID for error");
+      logger.warn("Invalid field ID for error addition");
+      return;
     }
+
     if (!error || typeof error !== "object" || !error.message) {
-      throw new Error("Invalid error parameters");
+      logger.warn(`Invalid error object provided for field "${fieldId}"`);
+      return;
     }
 
     // Use ValidationResult to track errors

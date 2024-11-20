@@ -25,7 +25,7 @@ export class ValidationEngine {
         await RuleProcessor.processRule(rule, context);
         logger.log(`Successfully processed rule: ${rule.ruleId}`);
       } catch (error) {
-        console.error(`Error processing rule: ${rule.ruleId}`, error);
+        logger.error(`Error processing rule: ${rule.ruleId}`, error);
         context.addError(rule.ruleId, {
           fieldId: rule.fieldId || "SYSTEM",
           message: `Rule processing failed: ${error.message}`,

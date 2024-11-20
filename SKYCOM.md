@@ -106,12 +106,12 @@ const rules = [
 controller.validateForm(formData, rules)
   .then(result => {
     if (result.hasErrors) {
-      console.error("Validation failed:", result.details);
+      logger.error("Validation failed:", result.details);
     } else {
       logger.log("Validation succeeded!");
     }
   })
-  .catch(error => console.error("Validation error:", error));
+  .catch(error => logger.error("Validation error:", error));
 ```
 
 ---

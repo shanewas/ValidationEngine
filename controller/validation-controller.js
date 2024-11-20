@@ -1,5 +1,8 @@
 import { ValidationEngine } from "../service/validation-engine.js";
 import { logger } from "../utils/logger.js";
+
+logger.disable();
+
 /**
  * Controller responsible for orchestrating validation flow.
  * Manages communication between the form data and validation engine.
@@ -17,22 +20,82 @@ export class ValidationController {
    * @throws {Error} - Throws an error if validation fails.
    */
   async validateForm(formData, rules) {
-    // Ensure formData is a valid object
-    if (!formData || typeof formData !== "object") {
-      throw new Error("Invalid form data provided");
+    const validationResult = {
+      hasErrors: false,
+      errorCount: 0,
+      details: {},
+      summary: [],
+      actions: {},
+    };
+
+    const addSystemError = (message) => {
+      validationResult.hasErrors = true;
+      validationResult.errorCount += 1;
+      validationResult.details.SYSTEM = [
+        {
+          message,
+          type: "SYSTEM_ERROR",
+          action: null,
+          actionValue: null,
+        },
+      ];
+      validationResult.summary.push({
+        type: "error",
+        fieldId: "SYSTEM",
+        message,
+      });
+    };
+
+    // Ensure formData is valid
+    if (
+      !formData ||
+      typeof formData !== "object" ||
+      !Object.values(formData).every(
+        (field) =>
+          field &&
+          typeof field === "object" &&
+          "fieldId" in field &&
+          "value" in field
+      )
+    ) {
+      const errorMessage = "Invalid form data provided";
+      addSystemError(errorMessage);
+
+      this.webhook?.trigger({
+        event: "validation.error",
+        details: validationResult,
+      });
+
+      return validationResult;
     }
 
-    // Ensure rules are a non-empty array
+    // Handle empty rules gracefully
     if (!Array.isArray(rules) || rules.length === 0) {
-      throw new Error("Validation rules must be a non-empty array");
+      return validationResult;
     }
 
     try {
-      // Delegate validation to the engine
-      return await this.engine.validate(formData, rules);
+      const result = await this.engine.validate(formData, rules);
+
+      const event = result.hasErrors
+        ? "validation.error"
+        : "validation.success";
+      this.webhook?.trigger({
+        event,
+        details: result,
+      });
+
+      return result;
     } catch (error) {
-      console.error("Validation failed:", error.message);
-      throw error;
+      const errorMessage = `Validation failed: ${error.message}`;
+      addSystemError(errorMessage);
+
+      this.webhook?.trigger({
+        event: "validation.error",
+        details: validationResult,
+      });
+
+      return validationResult;
     }
   }
 }

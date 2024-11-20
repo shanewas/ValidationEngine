@@ -41,7 +41,7 @@
         .validateForm(formData, rules)
         .then((result) => {
           if (result.hasErrors) {
-            console.error(
+            logger.error(
               "Validation failed:",
               JSON.stringify(result.details, null, 2)
             ); // Pretty-print the error details
@@ -50,7 +50,7 @@
           }
         })
         .catch((error) =>
-          console.error("Validation encountered an error:", error)
+          logger.error("Validation encountered an error:", error)
         );
     </script>
   </body>

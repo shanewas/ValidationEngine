@@ -73,7 +73,7 @@ const controller = new ValidationController();
 controller
   .validateForm(formData, rules)
   .then((result) => logger.log(result))
-  .catch((error) => console.error(error));
+  .catch((error) => logger.error(error));
 ```
 
 #### Standalone:
@@ -85,7 +85,7 @@ controller
   const controller = new ValidationController();
   controller.validateForm(formData, rules)
     .then((result) => logger.log(result))
-    .catch((error) => console.error(error));
+    .catch((error) => logger.error(error));
 </script>
 ```
 
@@ -138,12 +138,12 @@ controller
   .validateForm(formData, rules)
   .then((result) => {
     if (result.hasErrors) {
-      console.error("Validation failed:", result.details);
+      logger.error("Validation failed:", result.details);
     } else {
       logger.log("Validation succeeded!");
     }
   })
-  .catch((error) => console.error("System error:", error));
+  .catch((error) => logger.error("System error:", error));
 ```
 
 ---

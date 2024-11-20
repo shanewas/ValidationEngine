@@ -97,7 +97,7 @@ Field validation is the process of applying one or more validation conditions to
      const condition = { type: "REQUIRED" };
      const result = FieldValidator.validateRequired(field, condition);
      if (result) {
-       console.error("Validation error:", result.message);
+       logger.error("Validation error:", result.message);
      }
      ```
 
@@ -157,7 +157,7 @@ const controller = new ValidationController();
 controller.validateForm(formData, rules)
   .then(result => {
     if (result.hasErrors) {
-      console.error("Validation errors:", result.details);
+      logger.error("Validation errors:", result.details);
     } else {
       logger.log("Validation passed!");
     }

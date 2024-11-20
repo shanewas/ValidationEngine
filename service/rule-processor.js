@@ -1,8 +1,6 @@
 import { ValidationUtils } from "../utils/validation-utils.js";
 import { logger } from "../utils/logger.js";
 
-logger.enable();
-
 /**
  * RuleProcessor class handles the processing of individual validation rules.
  */
@@ -21,12 +19,15 @@ export class RuleProcessor {
    * Processes an individual validation rule.
    * @param {Object} rule - The validation rule to process.
    * @param {ValidationContext} context - The validation context.
-   * @throws {Error} - Throws error for unsupported or invalid rules.
    */
   static async processRule(rule, context) {
     logger.log(`Processing rule: ${rule.ruleId || "UNKNOWN_RULE"}`);
     // Validate rule structure
-    RuleProcessor.validateRuleStructure(rule);
+    const validationError = RuleProcessor.validateRuleStructure(rule, context);
+    if (validationError) {
+      context.addError(rule.fieldId || "UNKNOWN", validationError);
+      return; // Skip processing this rule
+    }
 
     // Get field value from context
     const fieldValue = context.getFieldValue(rule.fieldId);
@@ -61,21 +62,44 @@ export class RuleProcessor {
         break;
 
       default:
-        throw new Error(`Unsupported rule type: ${rule.type}`);
+        logger.warn(`Unsupported rule type: ${rule.type}`);
+        context.addError(rule.fieldId || "SYSTEM", {
+          message: `Unsupported rule type: ${rule.type}`,
+          type: "SYSTEM_ERROR",
+          details: { ruleId: rule.ruleId, type: rule.type },
+        });
     }
   }
 
   /**
    * Validates the structure of a rule.
    * @param {Object} rule - The rule to validate.
-   * @throws {Error} - Throws an error if the rule structure is invalid.
+   * @param {ValidationContext} context - The validation context to log errors.
+   * @returns {Object|null} - Returns an error object if the rule structure is invalid, otherwise null.
    */
   static validateRuleStructure(rule) {
-    if (!rule.type) throw new Error("Rule type is missing");
-    if (!rule.fieldId) throw new Error("Rule fieldId is missing");
-    if (!rule.errorMessage && rule.type !== "SUGGESTION") {
-      throw new Error("Rule errorMessage is missing");
+    if (!rule.type) {
+      return {
+        message: "Rule type is missing",
+        type: "RULE_STRUCTURE_ERROR",
+        details: { ruleId: rule.ruleId },
+      };
     }
+    if (!rule.fieldId) {
+      return {
+        message: "Rule fieldId is missing",
+        type: "RULE_STRUCTURE_ERROR",
+        details: { ruleId: rule.ruleId },
+      };
+    }
+    if (!rule.errorMessage && rule.type !== "SUGGESTION") {
+      return {
+        message: "Rule errorMessage is missing",
+        type: "RULE_STRUCTURE_ERROR",
+        details: { ruleId: rule.ruleId },
+      };
+    }
+    return null;
   }
 
   /**
@@ -123,12 +147,19 @@ export class RuleProcessor {
    * Processes a REGEX rule.
    */
   static processRegexRule(rule, fieldValue, context) {
-    const regex = new RegExp(rule.value);
-    if (!regex.test(fieldValue)) {
+    try {
+      const regex = new RegExp(rule.value);
+      if (!regex.test(fieldValue)) {
+        context.addError(rule.fieldId, {
+          message: rule.errorMessage,
+          type: "REGEX",
+          details: { pattern: rule.value, value: fieldValue },
+        });
+      }
+    } catch (error) {
       context.addError(rule.fieldId, {
-        message: rule.errorMessage,
-        type: "REGEX",
-        details: { pattern: rule.value, value: fieldValue },
+        message: `Invalid regex pattern: ${error.message}`,
+        type: "REGEX_ERROR",
       });
     }
   }
@@ -163,10 +194,6 @@ export class RuleProcessor {
 
   /**
    * Processes a LENGTH_CHECK rule.
-   * Ensures the length of a field value is within specified bounds.
-   * @param {Object} rule - The LENGTH_CHECK rule.
-   * @param {any} fieldValue - The field value.
-   * @param {ValidationContext} context - The validation context.
    */
   static processLengthCheckRule(rule, fieldValue, context) {
     const length = fieldValue ? String(fieldValue).length : 0;
@@ -186,10 +213,6 @@ export class RuleProcessor {
 
   /**
    * Processes a SUGGESTION rule.
-   * SUGGESTION rules do not raise errors; they only log suggestions.
-   * @param {Object} rule - The SUGGESTION rule.
-   * @param {any} fieldValue - The field value.
-   * @param {ValidationContext} context - The validation context.
    */
   static processSuggestionRule(rule, fieldValue, context) {
     logger.log(`Suggestion for field "${rule.fieldId}": ${rule.errorMessage}`);
